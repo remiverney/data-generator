@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>event-data-generator-expr</artifactId>
+  <name>Event data generator expressions</name>
+  
+  <parent>
+  	<groupId>org.eventdatagen</groupId>
+  	<artifactId>event-data-generator</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+			<annotationProcessors>
+				<annotationProcessor>org.datagen.utils.annotation.processing.I18nAnnotationProcessor</annotationProcessor>
+			</annotationProcessors>
+		</configuration>
+      </plugin>
+      <plugin>
+      	<groupId>org.antlr</groupId>
+      	<artifactId>antlr4-maven-plugin</artifactId>
+      	<configuration>
+      		<sourceDirectory>${basedir}/src/main/antlr</sourceDirectory>
+      		<libDirectory>${basedir}/src/main/antlr/imports</libDirectory>
+      		<outputDirectory>${project.build.directory}/generated-sources/antlr/org/datagen/generated/antlr/expression</outputDirectory>
+      		<arguments>
+      			<argument>-package</argument>
+      			<argument>org.datagen.generated.antlr.expression</argument>
+      		</arguments>
+      	</configuration>
+      	<executions>
+			<execution>
+				<goals>
+					<goal>antlr4</goal>
+				</goals>
+			</execution>
+      	</executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>log4j</groupId>
+  		<artifactId>log4j</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.antlr</groupId>
+  		<artifactId>antlr4</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.eventdatagen</groupId>
+  		<artifactId>event-data-generator-base</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
+</project>

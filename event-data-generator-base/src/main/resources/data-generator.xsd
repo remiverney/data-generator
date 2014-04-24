@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:tns="http://generator.datagen.org/data"
+	jaxb:version="2.0"
+	attributeFormDefault="unqualified"
+	elementFormDefault="unqualified"
+	targetNamespace="http://generator.datagen.org/data"
+	version="1.0">
+
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings generateIsSetMethod="true" collectionType="java.util.ArrayList">
+				<jaxb:serializable uid="1" />
+			</jaxb:globalBindings>
+			<jaxb:schemaBindings>
+				<jaxb:package name="org.datagen.data" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+	
+	<xs:simpleType name="id">
+    	<xs:restriction base="xs:NCName"/>
+    </xs:simpleType>
+	
+	<xs:simpleType name="id-ref">
+    	<xs:restriction base="tns:id"/>
+    </xs:simpleType>
+    
+	<xs:complexType name="identifiable" abstract="true">
+    	<xs:sequence>
+    		<xs:element name="id" type="tns:id"/>
+    	</xs:sequence>
+    </xs:complexType>
+	
+	<xs:element name="generator">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tns:connectors"/>
+				<xs:element ref="tns:streams"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="update-date" type="xs:dateTime"/>
+			<xs:attribute name="version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="connectors">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tns:connector" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+		
+	<xs:element name="connector">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tns:identifiable">
+					<xs:sequence>
+					</xs:sequence>
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="streams">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tns:stream" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="stream">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tns:identifiable">
+					<xs:sequence>
+						<xs:element ref="tns:fields"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="fields">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tns:field" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="field">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tns:identifiable">
+					<xs:sequence>
+						<xs:element name="expression" type="xs:string"/>
+					</xs:sequence>
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="properties">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tns:property" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="value" type="xs:anySimpleType"/>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

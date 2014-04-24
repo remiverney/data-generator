@@ -1,0 +1,26 @@
+package org.datagen.expr.ast.nodes;
+
+import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.exception.UnresolvedReferenceException;
+import org.datagen.expr.ast.intf.Node;
+import org.datagen.expr.ast.intf.Value;
+
+public class ThisRef implements Node {
+
+	public static final String THIS_VARIABLE = "#this#";
+
+	public ThisRef() {
+	}
+
+	@Override
+	public Value eval(EvalContext context) {
+		Value value = context.getVariable(THIS_VARIABLE);
+
+		if (value == null) {
+			throw new UnresolvedReferenceException(this, "this");
+		}
+
+		return value;
+	}
+
+}

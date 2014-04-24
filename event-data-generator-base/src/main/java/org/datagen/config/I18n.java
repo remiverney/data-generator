@@ -1,0 +1,19 @@
+package org.datagen.config;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD })
+public @interface I18n {
+
+	String value();
+
+	String key() default "";
+
+	String plural() default "";
+}
