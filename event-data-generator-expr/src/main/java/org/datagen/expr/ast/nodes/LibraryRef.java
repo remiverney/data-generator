@@ -1,6 +1,7 @@
 package org.datagen.expr.ast.nodes;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Library;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
 import org.datagen.expr.ast.intf.Node;
@@ -35,5 +36,11 @@ public class LibraryRef implements Reference {
 	@Override
 	public String getReference() {
 		return library + ":" + entry;
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		return builder.append(library).append(':').append(entry);
 	}
 }

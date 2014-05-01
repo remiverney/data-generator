@@ -10,4 +10,8 @@ public interface Operator<T> {
 	}
 
 	Evaluator getEvaluator();
+
+	String getSymbol();
+
+	Precedence getPrecedence();
 }

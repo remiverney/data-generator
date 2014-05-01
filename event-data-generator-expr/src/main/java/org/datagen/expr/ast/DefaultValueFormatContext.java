@@ -4,9 +4,8 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
-public class DefaultValueFormatContext implements ValueFormatContext {
+public class DefaultValueFormatContext extends SimpleValueFormatContext {
 
 	private static final Locale DEFAULT_LOCALE = Locale.US;
 
@@ -48,18 +47,5 @@ public class DefaultValueFormatContext implements ValueFormatContext {
 	@Override
 	public String formatDate(Date value) {
 		return this.dateFormat.format(value);
-	}
-
-	@Override
-	public String formatLambda(Lambda lambda) {
-		throw new UnsupportedOperationException(
-				"Cannot format a lambda function");
-	}
-
-	@Override
-	public String formatArray(Array array) {
-		return array.getAll().stream().sequential()
-				.map(x -> x.eval(null).toValueString(this))
-				.collect(Collectors.joining(", ", "{ ", " }"));
 	}
 }

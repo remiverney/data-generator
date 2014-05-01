@@ -18,6 +18,8 @@ start returns [Node node]: e=expr EOF
 
 expr returns [Node node]: p=primary
                           {$node = $p.node;}
+                        | e=expr '!'
+                          {$node = new Factorial($e.node);}
                         | '+' e=expr
                           {$node = $e.node;}
                         | '-' e=expr
@@ -30,16 +32,12 @@ expr returns [Node node]: p=primary
                           {$node = new ArrayRangeRef($a.node, $i.node, $i2.node);}
                         | e=expr '.' Identifier
                           {$node = new AttrRef($e.node, $Identifier.text);}
-                        | e1=expr '*' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.MUL);}
-                        | e1=expr '/' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.DIV);}
-                        | e1=expr '%' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.MOD);}
-                        | e1=expr '+' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.ADD);}
-                        | e1=expr '-' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.SUB);}
+                        | e1=expr '^' e2=expr
+                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW);}
+                        | e1=expr { Arithmetic op = null; } ('*' {op = Arithmetic.MUL;} | '/' {op = Arithmetic.DIV;} | '%' {op = Arithmetic.MOD;}) e2=expr
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op);}
+                        | e1=expr { Arithmetic op = null; } ('+' {op = Arithmetic.ADD;} | '-' {op = Arithmetic.SUB;}) e2=expr
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op);}
                         | e1=expr '<=' e2=expr
                           {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS_EQUAL);}
                         | e1=expr '>=' e2=expr
@@ -56,13 +54,13 @@ expr returns [Node node]: p=primary
                           {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL);}
                         | e1=expr '<>' e2=expr
                           {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL);}
-                        | '!' e=expr
+                        | ('!' | 'NOT') e=expr
                           {$node = new Not($e.node);}
                         | e1=expr ('AND' | '&&') e2=expr
                           {$node = new LogicOp($e1.node, $e2.node, Logic.AND);}
                         | e1=expr ('OR' | '||') e2=expr
                           {$node = new LogicOp($e1.node, $e2.node, Logic.OR);}
-                        | e1=expr ('XOR' | '^') e2=expr
+                        | e1=expr ('XOR' | '^^') e2=expr
                           {$node = new LogicOp($e1.node, $e2.node, Logic.XOR);}
                         | <assoc=right> e1=expr '?' e2=expr ':' e3=expr
                           {$node = new Ternary($e1.node, $e2.node, $e3.node);}

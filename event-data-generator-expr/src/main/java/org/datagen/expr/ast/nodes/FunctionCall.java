@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
@@ -38,5 +39,16 @@ public class FunctionCall implements Node {
 				name,
 				parameters.stream().map(p -> p.eval(context))
 						.collect(Collectors.toCollection(ArrayList::new)));
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		builder.append(':').append(name);
+		builder.append('(');
+		context.formatList(builder, parameters, ',');
+		builder.append(')');
+
+		return builder;
 	}
 }

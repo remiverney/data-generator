@@ -6,6 +6,7 @@ import java.util.List;
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.exception.NotAnArrayException;
 import org.datagen.expr.ast.intf.Node;
@@ -53,5 +54,14 @@ public class ArrayRef implements Node {
 		return ((Array) resolved).get(
 				ValueOperation.evalInteger(context, this, index.eval(context)))
 				.eval(context);
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		array.toString(builder, context).append('[');
+		index.toString(builder, context).append(']');
+
+		return builder;
 	}
 }

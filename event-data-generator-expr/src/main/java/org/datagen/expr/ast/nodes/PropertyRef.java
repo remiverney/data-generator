@@ -1,6 +1,7 @@
 package org.datagen.expr.ast.nodes;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
 import org.datagen.expr.ast.intf.Reference;
 import org.datagen.expr.ast.intf.Value;
@@ -27,6 +28,12 @@ public class PropertyRef implements Reference {
 	@Override
 	public String getReference() {
 		return property;
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		return builder.append('$').append(property);
 	}
 
 }

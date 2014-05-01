@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.datagen.expr.ast.AstWalker;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
@@ -150,5 +151,21 @@ public class LambdaDef implements Value, Lambda {
 							new DefaultValueFormatContext()));
 		}
 		return closure;
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		builder.append('(');
+		context.formatListString(builder, parameters, ',');
+		context.spacing(builder);
+		builder.append("->");
+		context.spacing(builder);
+
+		body.toString(builder, context);
+
+		builder.append(')');
+
+		return builder;
 	}
 }

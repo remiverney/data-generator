@@ -84,4 +84,10 @@ public final class MathFunctions {
 
 	public static final Function<Double, Double> deg = Math::toDegrees;
 	public static final Function<Double, Double> rad = Math::toRadians;
+
+	public static final Function<Double, Boolean> isNan = (x -> Double.isNaN(x));
+	public static final Function<Double, Boolean> isInfinite = (x -> Double
+			.isInfinite(x));
+	public static final Function<Double, Boolean> isFinite = (x -> Double
+			.isFinite(x));
 }

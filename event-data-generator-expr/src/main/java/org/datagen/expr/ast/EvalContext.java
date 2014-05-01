@@ -12,6 +12,7 @@ import org.datagen.utils.EmptyFunction;
 public interface EvalContext {
 
 	String PROPERTY_SEQUENCE = "seq";
+
 	String PROPERTY_TIME = "time";
 
 	Value getProperty(String property);

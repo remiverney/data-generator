@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.exception.IncompatibleAttributeException;
 import org.datagen.expr.ast.exception.UnknownAttributeException;
 import org.datagen.expr.ast.intf.Node;
@@ -12,7 +13,11 @@ import org.datagen.expr.ast.intf.Value;
 
 public class AttrRef implements Node {
 	private static enum Attribute {
-		LENGTH
+		LENGTH;
+
+		private String identifier() {
+			return name().toLowerCase();
+		}
 	}
 
 	private final Node expr;
@@ -47,5 +52,13 @@ public class AttrRef implements Node {
 			throw new IllegalArgumentException(
 					"Unexpected expression attribute '" + attribute + "'");
 		}
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		expr.toString(builder, context).append('.');
+
+		return builder.append(attribute.identifier());
 	}
 }

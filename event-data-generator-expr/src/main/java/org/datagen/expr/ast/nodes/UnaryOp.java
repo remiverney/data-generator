@@ -3,6 +3,7 @@ package org.datagen.expr.ast.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 
@@ -30,5 +31,14 @@ public abstract class UnaryOp<O extends Operator<O>> implements Node {
 		children.add(rhs);
 
 		return children;
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		builder.append(operator.getSymbol());
+		rhs.toString(builder, context);
+
+		return builder;
 	}
 }

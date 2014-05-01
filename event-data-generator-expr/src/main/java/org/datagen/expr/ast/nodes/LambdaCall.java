@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.exception.NotALambdaException;
 import org.datagen.expr.ast.intf.Node;
@@ -45,5 +46,16 @@ public class LambdaCall implements Node {
 				context,
 				parameters.stream().map(p -> p.eval(context))
 						.collect(Collectors.toCollection(ArrayList::new)));
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		lambda.toString(builder, context);
+		builder.append('(');
+		context.formatList(builder, parameters, ',');
+		builder.append(')');
+
+		return builder;
 	}
 }

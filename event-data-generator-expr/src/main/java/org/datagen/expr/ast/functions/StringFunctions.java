@@ -12,6 +12,9 @@ public final class StringFunctions {
 
 	public static final Function<String, Integer> strlen = String::length;
 
+	public static final Function<String, String> toUpperCase = String::toUpperCase;
+	public static final Function<String, String> toLowerCase = String::toLowerCase;
+
 	public static final TriFunction<String, Long, Long, String> substring = (t,
 			u, v) -> t.substring(u.intValue(), v.intValue());
 

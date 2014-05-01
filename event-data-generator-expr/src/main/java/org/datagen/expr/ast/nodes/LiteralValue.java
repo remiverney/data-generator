@@ -2,6 +2,7 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.Date;
 
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
@@ -91,7 +92,7 @@ public class LiteralValue implements Value {
 		case REAL:
 			return context.formatReal(real);
 		case STRING:
-			return string;
+			return context.formatString(string);
 		default:
 			return null;
 		}
@@ -112,5 +113,28 @@ public class LiteralValue implements Value {
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		switch (type) {
+		case BOOLEAN:
+			return builder.append(bool);
+		case DATE_TIME:
+			return builder.append(date);
+		case INTEGER:
+			return builder.append(integer);
+		case REAL:
+			return builder.append(real);
+		case STRING:
+			return builder.append('"').append(string).append('"');
+		default:
+			return builder;
+		}
+	}
+
+	public static LiteralValue from(boolean bool) {
+		return bool ? TRUE : FALSE;
 	}
 }

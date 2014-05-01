@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.exception.NotAnArrayException;
 import org.datagen.expr.ast.intf.Node;
@@ -49,5 +50,19 @@ public class ArrayRangeRef implements Node {
 								end.eval(context))).stream()
 				.map(x -> x.eval(context))
 				.collect(Collectors.toCollection(ArrayList::new)));
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		array.toString(builder, context).append('[');
+		start.toString(builder, context);
+		context.spacing(builder);
+		builder.append("..");
+		end.toString(builder, context);
+		context.spacing(builder);
+		builder.append(']');
+
+		return builder;
 	}
 }

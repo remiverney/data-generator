@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.exception.OutBoundsArrayException;
 import org.datagen.expr.ast.intf.Node;
@@ -94,5 +95,19 @@ public class ArrayDef implements Value, Array {
 	@Override
 	public String toValueString(ValueFormatContext context) {
 		return context.formatArray(this);
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		builder.append('{');
+		context.spacing(builder);
+
+		context.formatList(builder, items, ',');
+
+		context.spacing(builder);
+		builder.append('}');
+
+		return builder;
 	}
 }

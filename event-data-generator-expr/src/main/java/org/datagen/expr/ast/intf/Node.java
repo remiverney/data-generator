@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 
 public interface Node extends Composite<Node>, Visitable<Node> {
 
@@ -24,4 +25,7 @@ public interface Node extends Composite<Node>, Visitable<Node> {
 	default public int getSourceCol() {
 		return 0;
 	}
+
+	StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context);
 }

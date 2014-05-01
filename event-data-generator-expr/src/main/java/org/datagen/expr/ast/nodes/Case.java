@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.exception.NoMatchingCaseException;
 import org.datagen.expr.ast.intf.Node;
@@ -88,6 +90,38 @@ public class Case implements Node {
 				throw new NoMatchingCaseException(this);
 			}
 		}
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		context.newline(builder);
+		context.formatKeyword(builder, Keywords.CASE);
+
+		if (expr != null) {
+			context.spacing(builder);
+			expr.toString(builder, context);
+		}
+
+		context.nest();
+
+		for (CaseWhen caze : cases) {
+			context.newline(builder);
+			caze.toString(builder, context);
+		}
+
+		if (otherwise != null) {
+			context.newline(builder);
+			context.formatKeyword(builder, Keywords.ELSE);
+			context.spacing(builder);
+			otherwise.toString(builder, context);
+		}
+
+		context.unnest();
+		context.newline(builder);
+		context.formatKeyword(builder, Keywords.END);
+
+		return builder;
 	}
 
 }

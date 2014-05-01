@@ -4,6 +4,10 @@ import java.util.Date;
 
 public interface ValueFormatContext {
 
+	default String formatString(String value) {
+		return value;
+	}
+
 	String formatInteger(long value);
 
 	String formatReal(double value);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -48,6 +49,22 @@ public class Ternary implements Node {
 		return ValueOperation.evalBoolean(context, this,
 				condition.eval(context)) ? then.eval(context) : otherwise
 				.eval(context);
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		condition.toString(builder, context);
+		context.spacing(builder);
+		builder.append('?');
+		context.spacing(builder);
+		then.toString(builder, context);
+		context.spacing(builder);
+		builder.append(':');
+		context.spacing(builder);
+		otherwise.toString(builder, context);
+
+		return builder;
 	}
 
 }

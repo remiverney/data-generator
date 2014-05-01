@@ -1,6 +1,7 @@
 package org.datagen.expr.ast.nodes;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -8,6 +9,7 @@ import org.datagen.expr.ast.intf.Value;
 public class ThisRef implements Node {
 
 	public static final String THIS_VARIABLE = "#this#";
+	public static final String THIS = "this";
 
 	public ThisRef() {
 	}
@@ -21,6 +23,12 @@ public class ThisRef implements Node {
 		}
 
 		return value;
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		return builder.append(THIS);
 	}
 
 }

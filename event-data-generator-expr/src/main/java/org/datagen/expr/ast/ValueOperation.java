@@ -7,9 +7,12 @@ import org.datagen.expr.ast.intf.Arithmetic;
 import org.datagen.expr.ast.intf.Comparison;
 import org.datagen.expr.ast.intf.Logic;
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.expr.ast.nodes.ArithmeticOp;
 import org.datagen.expr.ast.nodes.ArrayDef;
+import org.datagen.expr.ast.nodes.LambdaDef;
 import org.datagen.expr.ast.nodes.LiteralValue;
 import org.datagen.utils.CollectionUtils;
 
@@ -26,6 +29,10 @@ public strictfp final class ValueOperation {
 			case ARRAY:
 				return new ArrayDef(CollectionUtils.concat(
 						((ArrayDef) v1).getItems(), ((ArrayDef) v2).getItems()));
+			case LAMBDA:
+				return new LambdaDef(((LambdaDef) v2).getParameters(),
+						new ArithmeticOp(v1, ((LambdaDef) v2).getBody(),
+								Arithmetic.ADD)).eval(context);
 			default:
 				throw new IncompatibleTypesException(operator, Arithmetic.ADD,
 						v1, v2);
@@ -35,6 +42,10 @@ public strictfp final class ValueOperation {
 			case INTEGER:
 				return new LiteralValue(new Date(((LiteralValue) v1).getDate()
 						.getTime() + ((LiteralValue) v2).getInteger()));
+			case LAMBDA:
+				return new LambdaDef(((LambdaDef) v2).getParameters(),
+						new ArithmeticOp(v1, ((LambdaDef) v2).getBody(),
+								Arithmetic.ADD)).eval(context);
 			default:
 				throw new IncompatibleTypesException(operator, Arithmetic.ADD,
 						v1, v2);
@@ -51,6 +62,10 @@ public strictfp final class ValueOperation {
 				return new LiteralValue(v1.toValueString(context
 						.getFormatContext())
 						+ v2.toValueString(context.getFormatContext()));
+			case LAMBDA:
+				return new LambdaDef(((LambdaDef) v2).getParameters(),
+						new ArithmeticOp(v1, ((LambdaDef) v2).getBody(),
+								Arithmetic.ADD)).eval(context);
 			default:
 				throw new IncompatibleTypesException(operator, Arithmetic.ADD,
 						v1, v2);
@@ -67,14 +82,35 @@ public strictfp final class ValueOperation {
 				return new LiteralValue(v1.toValueString(context
 						.getFormatContext())
 						+ v2.toValueString(context.getFormatContext()));
+			case LAMBDA:
+				return new LambdaDef(((LambdaDef) v2).getParameters(),
+						new ArithmeticOp(v1, ((LambdaDef) v2).getBody(),
+								Arithmetic.ADD)).eval(context);
 			default:
 				throw new IncompatibleTypesException(operator, Arithmetic.ADD,
 						v1, v2);
 			}
 		case STRING:
-			return new LiteralValue(
-					v1.toValueString(context.getFormatContext())
-							+ v2.toValueString(context.getFormatContext()));
+			switch (v2.getType()) {
+			case LAMBDA:
+				return new LambdaDef(((LambdaDef) v2).getParameters(),
+						new ArithmeticOp(v1, ((LambdaDef) v2).getBody(),
+								Arithmetic.ADD)).eval(context);
+			default:
+				return new LiteralValue(v1.toValueString(context
+						.getFormatContext())
+						+ v2.toValueString(context.getFormatContext()));
+			}
+		case LAMBDA:
+			switch (v2.getType()) {
+			case LAMBDA:
+				throw new IncompatibleTypesException(operator, Arithmetic.ADD,
+						v1, v2);
+			default:
+				return new LambdaDef(((LambdaDef) v1).getParameters(),
+						new ArithmeticOp(((LambdaDef) v1).getBody(), v2,
+								Arithmetic.ADD)).eval(context);
+			}
 		default:
 			throw new IncompatibleTypesException(operator, Arithmetic.ADD, v1,
 					v2);
@@ -233,12 +269,61 @@ public strictfp final class ValueOperation {
 		}
 	}
 
+	public static LiteralValue fact(EvalContext context, Node operator, Value v) {
+		ensureIntegerValue(operator, Arithmetic.FACT, v);
+
+		long n = ((LiteralValue) v).getInteger();
+
+		long accum = 1;
+
+		for (; n > 1; n--) {
+			accum *= n;
+		}
+
+		return new LiteralValue(accum);
+	}
+
+	public static strictfp Value pow(EvalContext context, Node operator,
+			Value v1, Value v2) {
+		switch (v1.getType()) {
+		case INTEGER:
+			switch (v2.getType()) {
+			case INTEGER:
+				return new LiteralValue(Math.pow(
+						((LiteralValue) v1).getInteger(),
+						((LiteralValue) v2).getInteger()));
+			case REAL:
+				return new LiteralValue(Math.pow(
+						((LiteralValue) v1).getInteger(),
+						((LiteralValue) v2).getReal()));
+			default:
+				throw new IncompatibleTypesException(operator, Arithmetic.POW,
+						v1, v2);
+			}
+		case REAL:
+			switch (v2.getType()) {
+			case INTEGER:
+				return new LiteralValue(Math.pow(((LiteralValue) v1).getReal(),
+						((LiteralValue) v2).getInteger()));
+			case REAL:
+				return new LiteralValue(Math.pow(((LiteralValue) v1).getReal(),
+						((LiteralValue) v2).getReal()));
+			default:
+				throw new IncompatibleTypesException(operator, Arithmetic.POW,
+						v1, v2);
+			}
+		default:
+			throw new IncompatibleTypesException(operator, Arithmetic.POW, v1,
+					v2);
+		}
+	}
+
 	public static LiteralValue and(EvalContext context, Node operator,
 			Value v1, Value v2) {
 		ensureBooleanValue(operator, Logic.AND, v1);
 		ensureBooleanValue(operator, Logic.AND, v2);
 
-		return new LiteralValue(((LiteralValue) v1).getBool()
+		return LiteralValue.from(((LiteralValue) v1).getBool()
 				&& ((LiteralValue) v2).getBool());
 	}
 
@@ -247,7 +332,7 @@ public strictfp final class ValueOperation {
 		ensureBooleanValue(operator, Logic.OR, v1);
 		ensureBooleanValue(operator, Logic.OR, v2);
 
-		return new LiteralValue(((LiteralValue) v1).getBool()
+		return LiteralValue.from(((LiteralValue) v1).getBool()
 				|| ((LiteralValue) v2).getBool());
 	}
 
@@ -256,19 +341,19 @@ public strictfp final class ValueOperation {
 		ensureBooleanValue(operator, Logic.XOR, v1);
 		ensureBooleanValue(operator, Logic.XOR, v2);
 
-		return new LiteralValue(((LiteralValue) v1).getBool()
+		return LiteralValue.from(((LiteralValue) v1).getBool()
 				^ ((LiteralValue) v2).getBool());
 	}
 
 	public static LiteralValue not(EvalContext context, Node operator, Value v) {
 		ensureBooleanValue(operator, Logic.NOT, v);
 
-		return new LiteralValue(!((LiteralValue) v).getBool());
+		return LiteralValue.from(!((LiteralValue) v).getBool());
 	}
 
 	public static LiteralValue equal(EvalContext context, Node operator,
 			Value v1, Value v2) {
-		return new LiteralValue(_equal(context, operator, v1, v2));
+		return LiteralValue.from(_equal(context, operator, v1, v2));
 	}
 
 	public static boolean _equal(EvalContext context, Node operator, Value v1,
@@ -348,7 +433,7 @@ public strictfp final class ValueOperation {
 
 	public static LiteralValue notEqual(EvalContext context, Node operator,
 			Value v1, Value v2) {
-		return new LiteralValue(!_equal(context, operator, v1, v2));
+		return LiteralValue.from(!_equal(context, operator, v1, v2));
 	}
 
 	public static LiteralValue less(EvalContext context, Node operator,
@@ -357,12 +442,12 @@ public strictfp final class ValueOperation {
 		case INTEGER:
 			switch (v2.getType()) {
 			case INTEGER:
-				return new LiteralValue(
-						((LiteralValue) v1).getInteger() < ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getInteger() < ((LiteralValue) v2)
 								.getInteger());
 			case REAL:
-				return new LiteralValue(
-						((LiteralValue) v1).getInteger() < ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getInteger() < ((LiteralValue) v2)
 								.getReal());
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -371,12 +456,12 @@ public strictfp final class ValueOperation {
 		case REAL:
 			switch (v2.getType()) {
 			case INTEGER:
-				return new LiteralValue(
-						((LiteralValue) v1).getReal() < ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getReal() < ((LiteralValue) v2)
 								.getInteger());
 			case REAL:
-				return new LiteralValue(
-						((LiteralValue) v1).getReal() < ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getReal() < ((LiteralValue) v2)
 								.getReal());
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -385,7 +470,7 @@ public strictfp final class ValueOperation {
 		case DATE_TIME:
 			switch (v2.getType()) {
 			case DATE_TIME:
-				return new LiteralValue(((LiteralValue) v1).getDate().before(
+				return LiteralValue.from(((LiteralValue) v1).getDate().before(
 						((LiteralValue) v2).getDate()));
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -394,7 +479,7 @@ public strictfp final class ValueOperation {
 		case STRING:
 			switch (v2.getType()) {
 			case STRING:
-				return new LiteralValue(((LiteralValue) v1).getString()
+				return LiteralValue.from(((LiteralValue) v1).getString()
 						.compareTo(((LiteralValue) v2).getString()) < 0);
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -408,7 +493,7 @@ public strictfp final class ValueOperation {
 
 	public static LiteralValue lessEqual(EvalContext context, Node operator,
 			Value v1, Value v2) {
-		return new LiteralValue(!greater(context, operator, v1, v2).getBool());
+		return LiteralValue.from(!greater(context, operator, v1, v2).getBool());
 	}
 
 	public static LiteralValue greater(EvalContext context, Node operator,
@@ -417,12 +502,12 @@ public strictfp final class ValueOperation {
 		case INTEGER:
 			switch (v2.getType()) {
 			case INTEGER:
-				return new LiteralValue(
-						((LiteralValue) v1).getInteger() > ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getInteger() > ((LiteralValue) v2)
 								.getInteger());
 			case REAL:
-				return new LiteralValue(
-						((LiteralValue) v1).getInteger() > ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getInteger() > ((LiteralValue) v2)
 								.getReal());
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -431,12 +516,12 @@ public strictfp final class ValueOperation {
 		case REAL:
 			switch (v2.getType()) {
 			case INTEGER:
-				return new LiteralValue(
-						((LiteralValue) v1).getReal() > ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getReal() > ((LiteralValue) v2)
 								.getInteger());
 			case REAL:
-				return new LiteralValue(
-						((LiteralValue) v1).getReal() > ((LiteralValue) v2)
+				return LiteralValue
+						.from(((LiteralValue) v1).getReal() > ((LiteralValue) v2)
 								.getReal());
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -445,7 +530,7 @@ public strictfp final class ValueOperation {
 		case DATE_TIME:
 			switch (v2.getType()) {
 			case DATE_TIME:
-				return new LiteralValue(((LiteralValue) v1).getDate().after(
+				return LiteralValue.from(((LiteralValue) v1).getDate().after(
 						((LiteralValue) v2).getDate()));
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -454,7 +539,7 @@ public strictfp final class ValueOperation {
 		case STRING:
 			switch (v2.getType()) {
 			case STRING:
-				return new LiteralValue(((LiteralValue) v1).getString()
+				return LiteralValue.from(((LiteralValue) v1).getString()
 						.compareTo(((LiteralValue) v2).getString()) > 0);
 			default:
 				throw new IncompatibleTypesException(operator, Comparison.LESS,
@@ -468,7 +553,7 @@ public strictfp final class ValueOperation {
 
 	public static LiteralValue greaterEqual(EvalContext context, Node operator,
 			Value v1, Value v2) {
-		return new LiteralValue(!less(context, operator, v1, v2).getBool());
+		return LiteralValue.from(!less(context, operator, v1, v2).getBool());
 	}
 
 	public static boolean evalBoolean(EvalContext context, Node operator,
@@ -485,15 +570,17 @@ public strictfp final class ValueOperation {
 		return ((LiteralValue) value).getInteger();
 	}
 
-	private static void ensureBooleanValue(Node operator, Logic logic, Value v) {
+	private static void ensureBooleanValue(Node node, Operator<?> operator,
+			Value v) {
 		if (v.getType() != ValueType.BOOLEAN) {
-			throw new IncompatibleTypesException(operator, logic, v);
+			throw new IncompatibleTypesException(node, operator, v);
 		}
 	}
 
-	private static void ensureIntegerValue(Node operator, Logic logic, Value v) {
+	private static void ensureIntegerValue(Node node, Operator<?> operator,
+			Value v) {
 		if (v.getType() != ValueType.INTEGER) {
-			throw new IncompatibleTypesException(operator, logic, v);
+			throw new IncompatibleTypesException(node, operator, v);
 		}
 	}
 }

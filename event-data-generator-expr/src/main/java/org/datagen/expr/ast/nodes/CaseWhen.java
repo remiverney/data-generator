@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
@@ -38,6 +40,20 @@ public class CaseWhen implements Node {
 	@Override
 	public Value eval(EvalContext context) {
 		return then.eval(context);
+	}
+
+	@Override
+	public StringBuilder toString(StringBuilder builder,
+			ExpressionFormatContext context) {
+		context.formatKeyword(builder, Keywords.WHEN);
+		context.spacing(builder);
+		when.toString(builder, context);
+		context.spacing(builder);
+		context.formatKeyword(builder, Keywords.THEN);
+		context.spacing(builder);
+		then.toString(builder, context);
+
+		return builder;
 	}
 
 }

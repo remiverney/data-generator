@@ -16,6 +16,7 @@ import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.EvalContextImpl;
+import org.datagen.expr.ast.PrettyExpressionFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.utils.DependencyOrder;
@@ -82,12 +83,27 @@ public class InterpreterImpl implements Interpreter {
 
 	@Override
 	public Map<String, Value> eval() {
-		return sorted.stream().collect(
-				Collectors.toMap(Function.<String> identity(), x -> {
-					Value value = expressions.get(x).getRoot().eval(context);
-					context.setField(x, value);
-					return value;
-				}));
+		return sorted
+				.stream()
+				.collect(
+						Collectors.toMap(
+								Function.<String> identity(),
+								x -> {
+
+									System.out
+											.println("print:"
+													+ expressions
+															.get(x)
+															.getRoot()
+															.toString(
+																	new StringBuilder(),
+																	new PrettyExpressionFormatContext()));
+
+									Value value = expressions.get(x).getRoot()
+											.eval(context);
+									context.setField(x, value);
+									return value;
+								}));
 	}
 
 	@Override
