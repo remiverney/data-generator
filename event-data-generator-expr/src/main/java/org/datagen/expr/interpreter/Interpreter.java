@@ -1,4 +1,4 @@
-package org.datagen.expr;
+package org.datagen.expr.interpreter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,7 @@ import java.util.Map;
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.factory.Config;
 
 public interface Interpreter {
 
@@ -39,6 +40,8 @@ public interface Interpreter {
 	void registerLibrary(String name, Map<String, String> library);
 
 	void unregisterLibrary(String name);
+
+	void setConfiguration(Config<InterpreterParameters> configuration);
 
 	Map<String, Value> eval();
 

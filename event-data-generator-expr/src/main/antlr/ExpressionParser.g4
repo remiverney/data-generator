@@ -1,6 +1,6 @@
 grammar ExpressionParser;
 
-@header {
+@parser::header {
 import java.util.*;
 
 import org.datagen.expr.ast.*;
@@ -9,8 +9,15 @@ import org.datagen.expr.ast.nodes.*;
 import org.datagen.expr.ast.functions.ShortOperators;
 }
 
-import ExpressionLexer;
+@parser::members {
+	private org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration;
+	
+	public void setConfiguration(org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration) {
+		this.configuration = configuration;
+	}
+}
 
+import ExpressionLexer;
 
 start returns [Node node]: e=expr EOF 
                            {$node = $e.node;}
@@ -76,7 +83,7 @@ whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
 
 primary returns [Node node]: '(' e=expr ')'
                              {$node = $e.node;}
-                           | l=lambda
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=lambda
                              {$node = $l.lambdadef;}
                            | '{' el=exprlist '}'
                              {$node = new ArrayDef($el.list);}

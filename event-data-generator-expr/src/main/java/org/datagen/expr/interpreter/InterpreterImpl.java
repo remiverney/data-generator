@@ -1,4 +1,4 @@
-package org.datagen.expr;
+package org.datagen.expr.interpreter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +13,18 @@ import java.util.stream.Collectors;
 
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
+import org.datagen.expr.DateProvider;
+import org.datagen.expr.SystemDateProvider;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.EvalContextImpl;
 import org.datagen.expr.ast.PrettyExpressionFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.expr.parser.Parser;
+import org.datagen.expr.parser.ParserResult;
+import org.datagen.factory.Config;
+import org.datagen.factory.ConfigBuilder;
 import org.datagen.utils.DependencyOrder;
 
 public class InterpreterImpl implements Interpreter {
@@ -31,6 +37,7 @@ public class InterpreterImpl implements Interpreter {
 	private final DateProvider dateProvider;
 	private final ValueFormatContext formatContext;
 	private final EvalContext context;
+	private Config<InterpreterParameters> configuration;
 
 	public InterpreterImpl() {
 		this(new SystemDateProvider(), new DefaultValueFormatContext());
@@ -42,6 +49,7 @@ public class InterpreterImpl implements Interpreter {
 		this.formatContext = formatContext;
 		this.context = new EvalContextImpl(this.dateProvider,
 				this.formatContext);
+		this.configuration = new ConfigBuilder<InterpreterParameters>().build();
 	}
 
 	@Override
@@ -169,7 +177,8 @@ public class InterpreterImpl implements Interpreter {
 	}
 
 	private void registerExpressionUnchecked(String column, String expression) {
-		if (expressions.putIfAbsent(column, Parser.parse(expression)) != null) {
+		if (expressions.putIfAbsent(column,
+				Parser.parse(expression, configuration)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -177,7 +186,8 @@ public class InterpreterImpl implements Interpreter {
 
 	private void registerExpressionUnchecked(String column, InputStream stream)
 			throws IOException {
-		if (expressions.putIfAbsent(column, Parser.parse(stream)) != null) {
+		if (expressions
+				.putIfAbsent(column, Parser.parse(stream, configuration)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -185,7 +195,8 @@ public class InterpreterImpl implements Interpreter {
 
 	private void registerExpressionUnchecked(String column, Reader reader)
 			throws IOException {
-		if (expressions.putIfAbsent(column, Parser.parse(reader)) != null) {
+		if (expressions
+				.putIfAbsent(column, Parser.parse(reader, configuration)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -216,13 +227,18 @@ public class InterpreterImpl implements Interpreter {
 						.collect(
 								Collectors.toMap(
 										Map.Entry<String, String>::getKey,
-										x -> Parser.parse(x.getValue())
-												.getRoot())));
+										x -> Parser.parse(x.getValue(),
+												configuration).getRoot())));
 	}
 
 	@Override
 	public void unregisterLibrary(String name) {
 		this.context.unregisterLibrary(name);
+	}
+
+	@Override
+	public void setConfiguration(Config<InterpreterParameters> configuration) {
+		this.configuration = configuration;
 	}
 
 }

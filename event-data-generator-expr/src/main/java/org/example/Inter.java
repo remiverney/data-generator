@@ -9,11 +9,13 @@ import java.util.Map;
 
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
-import org.datagen.expr.Interpreter;
-import org.datagen.expr.InterpreterImpl;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.expr.interpreter.Interpreter;
+import org.datagen.expr.interpreter.InterpreterFactory;
+import org.datagen.expr.interpreter.InterpreterParameters;
+import org.datagen.factory.ConfigBuilder;
 
 public class Inter {
 
@@ -59,7 +61,10 @@ public class Inter {
 		expressions.put("col5", new FileInputStream(
 				"src/main/antlr/sample5.txt"));
 
-		Interpreter inter = new InterpreterImpl();
+		ConfigBuilder<InterpreterParameters> builder = InterpreterFactory
+				.instance().getConfigBuilder()
+				.enable(InterpreterParameters.ALLOW_LAMBDA_DEFINITION);
+		Interpreter inter = InterpreterFactory.instance().get(builder.build());
 		inter.registerLibrary("mylib", library);
 		inter.registerExpressionsStream(expressions);
 
