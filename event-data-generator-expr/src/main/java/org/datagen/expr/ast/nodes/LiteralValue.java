@@ -134,6 +134,11 @@ public class LiteralValue implements Value {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return type + ": " + get();
+	}
+
 	public static LiteralValue from(boolean bool) {
 		return bool ? TRUE : FALSE;
 	}

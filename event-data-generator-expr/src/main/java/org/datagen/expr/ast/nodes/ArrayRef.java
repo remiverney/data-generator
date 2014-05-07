@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.datagen.expr.ast.Array;
-import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.ValueOperation;
@@ -42,14 +41,6 @@ public class ArrayRef implements Node {
 		if (!resolved.isArray()) {
 			throw new NotAnArrayException(this, resolved.getType());
 		}
-
-		System.out
-				.println("access idx "
-						+ ValueOperation.evalInteger(context, this,
-								index.eval(context))
-						+ " of array "
-						+ resolved
-								.toValueString(new DefaultValueFormatContext()));
 
 		return ((Array) resolved).get(
 				ValueOperation.evalInteger(context, this, index.eval(context)))

@@ -7,6 +7,7 @@ import org.datagen.expr.DateProvider;
 import org.datagen.expr.ast.functions.FunctionRegistry;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.expr.ast.parallel.ParallelExecutor;
 import org.datagen.utils.EmptyFunction;
 
 public interface EvalContext {
@@ -60,4 +61,8 @@ public interface EvalContext {
 	void unregisterLibrary(String name);
 
 	Library getLibrary(String name);
+
+	boolean isParallelizable();
+
+	ParallelExecutor getParallelExecutor();
 }

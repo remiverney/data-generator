@@ -31,9 +31,12 @@ public final class MathFunctions {
 	private MathFunctions() {
 	}
 
+	@NonDeterministc
 	public static final EmptyFunction<Double> random = StaticRandom::nextDouble;
+	@NonDeterministc
 	public static final EmptyFunction<Long> lrandom = StaticRandom::nextLong;
 
+	@NonDeterministc
 	public static final EmptyFunction<Double> gaussian = StaticRandom::nextGaussian;
 
 	public static final Function<Double, Double> abs = Math::abs;

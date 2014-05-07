@@ -12,6 +12,7 @@ import org.datagen.expr.ast.functions.FunctionRegistryImpl;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.nodes.LiteralValue;
+import org.datagen.expr.ast.parallel.ParallelExecutor;
 import org.datagen.utils.EmptyFunction;
 
 public class EvalContextImpl implements EvalContext {
@@ -47,14 +48,19 @@ public class EvalContextImpl implements EvalContext {
 	private final DateProvider dateProvider;
 	private final ValueFormatContext formatContext;
 	private final FunctionRegistry functionRegistry;
+	private final boolean isParallelizable;
+	private final ParallelExecutor parallelExecutor;
 
 	private long sequence = 1;
 
 	public EvalContextImpl(DateProvider dateProvider,
-			ValueFormatContext formatContext) {
+			ValueFormatContext formatContext, boolean isParallelizable,
+			ParallelExecutor parallelExecutor) {
 		this.dateProvider = dateProvider;
 		this.formatContext = formatContext;
 		this.functionRegistry = new FunctionRegistryImpl();
+		this.isParallelizable = isParallelizable;
+		this.parallelExecutor = parallelExecutor;
 
 		setProperty(PROPERTY_SEQUENCE, () -> new LiteralValue(sequence));
 		setProperty(PROPERTY_TIME,
@@ -194,4 +200,13 @@ public class EvalContextImpl implements EvalContext {
 		return this.libraries.get(name);
 	}
 
+	@Override
+	public boolean isParallelizable() {
+		return this.isParallelizable;
+	}
+
+	@Override
+	public ParallelExecutor getParallelExecutor() {
+		return this.parallelExecutor;
+	}
 }

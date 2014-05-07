@@ -4,11 +4,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.datagen.expr.ast.exception.ParserException;
+import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.nodes.FieldRef;
 import org.datagen.expr.interpreter.InterpreterParameters;
@@ -49,35 +58,83 @@ public class Parser {
 		}
 	}
 
-	public static ParserResult parse(String expression) {
+	private static class ParserErrorListener implements ANTLRErrorListener {
+
+		private final Collection<ParserException> errors = new ArrayList<>();
+
+		@Override
+		public void syntaxError(Recognizer<?, ?> recognizer,
+				Object offendingSymbol, int line, int charPositionInLine,
+				String msg, RecognitionException e) {
+			ParserException error = new ParserException(line,
+					charPositionInLine,
+					offendingSymbol != null ? ((Token) offendingSymbol)
+							.getText() : null, msg, e);
+
+			errors.add(error);
+		}
+
+		@Override
+		public void reportAmbiguity(org.antlr.v4.runtime.Parser recognizer,
+				DFA dfa, int startIndex, int stopIndex, boolean exact,
+				BitSet ambigAlts, ATNConfigSet configs) {
+		}
+
+		@Override
+		public void reportAttemptingFullContext(
+				org.antlr.v4.runtime.Parser recognizer, DFA dfa,
+				int startIndex, int stopIndex, BitSet conflictingAlts,
+				ATNConfigSet configs) {
+		}
+
+		@Override
+		public void reportContextSensitivity(
+				org.antlr.v4.runtime.Parser recognizer, DFA dfa,
+				int startIndex, int stopIndex, int prediction,
+				ATNConfigSet configs) {
+		}
+
+		public Collection<ParserException> getErrors() {
+			return errors;
+		}
+
+	}
+
+	public static ParserResult parse(String expression) throws ParsingException {
 		return parse(new ANTLRInputStream(expression), null);
 	}
 
-	public static ParserResult parse(InputStream stream) throws IOException {
+	public static ParserResult parse(InputStream stream) throws IOException,
+			ParsingException {
 		return parse(new ANTLRInputStream(stream), null);
 	}
 
-	public static ParserResult parse(Reader reader) throws IOException {
+	public static ParserResult parse(Reader reader) throws IOException,
+			ParsingException {
 		return parse(new ANTLRInputStream(reader), null);
 	}
 
 	public static ParserResult parse(String expression,
-			Config<InterpreterParameters> configuration) {
+			Config<InterpreterParameters> configuration)
+			throws ParsingException {
 		return parse(new ANTLRInputStream(expression), configuration);
 	}
 
 	public static ParserResult parse(InputStream stream,
-			Config<InterpreterParameters> configuration) throws IOException {
+			Config<InterpreterParameters> configuration) throws IOException,
+			ParsingException {
 		return parse(new ANTLRInputStream(stream), configuration);
 	}
 
 	public static ParserResult parse(Reader reader,
-			Config<InterpreterParameters> configuration) throws IOException {
+			Config<InterpreterParameters> configuration) throws IOException,
+			ParsingException {
 		return parse(new ANTLRInputStream(reader), configuration);
 	}
 
 	private static ParserResult parse(ANTLRInputStream stream,
-			Config<InterpreterParameters> configuration) {
+			Config<InterpreterParameters> configuration)
+			throws ParsingException {
 		ExpressionParserLexer lexer = new ExpressionParserLexer(stream);
 
 		// Get a list of matched tokens
@@ -88,6 +145,10 @@ public class Parser {
 		parser.setConfiguration(configuration != null ? configuration
 				: new ConfigBuilder<InterpreterParameters>().build());
 
+		ParserErrorListener errorListener = new ParserErrorListener();
+		parser.addErrorListener(errorListener);
+		lexer.addErrorListener(errorListener);
+
 		// Specify our entry point
 		StartContext ctx = parser.start();
 
@@ -96,7 +157,11 @@ public class Parser {
 		ExpressionParserListener listener = new ExpressionParserListener();
 		walker.walk(listener, ctx);
 
+		if (!errorListener.getErrors().isEmpty()) {
+			throw new ParsingException("Expression parsing error",
+					errorListener.getErrors());
+		}
+
 		return listener;
 	}
-
 }

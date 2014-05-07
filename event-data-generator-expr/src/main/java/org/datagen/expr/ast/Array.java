@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.datagen.expr.ast.intf.Node;
 
-public interface Array {
+public interface Array extends Iterable<Node> {
 
 	String getName();
 
@@ -14,5 +14,5 @@ public interface Array {
 
 	List<Node> getRange(long start, long end);
 
-	List<Node> getAll();
+	List<? extends Node> getAll();
 }

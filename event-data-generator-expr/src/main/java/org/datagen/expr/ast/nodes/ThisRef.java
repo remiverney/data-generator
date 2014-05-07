@@ -3,10 +3,10 @@ package org.datagen.expr.ast.nodes;
 import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
-import org.datagen.expr.ast.intf.Node;
+import org.datagen.expr.ast.intf.Reference;
 import org.datagen.expr.ast.intf.Value;
 
-public class ThisRef implements Node {
+public class ThisRef implements Reference {
 
 	public static final String THIS_VARIABLE = "#this#";
 	public static final String THIS = "this";
@@ -23,6 +23,11 @@ public class ThisRef implements Node {
 		}
 
 		return value;
+	}
+
+	@Override
+	public String getReference() {
+		return THIS;
 	}
 
 	@Override

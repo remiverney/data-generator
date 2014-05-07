@@ -2,6 +2,7 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +19,9 @@ public class ArrayDef implements Value, Array {
 
 	private final List<Node> items;
 
-	public ArrayDef(List<Node> items) {
-		this.items = items;
+	@SuppressWarnings("unchecked")
+	public ArrayDef(List<? extends Node> items) {
+		this.items = (List<Node>) items;
 	}
 
 	public List<Node> getItems() {
@@ -77,8 +79,13 @@ public class ArrayDef implements Value, Array {
 	}
 
 	@Override
-	public List<Node> getAll() {
+	public List<? extends Node> getAll() {
 		return items;
+	}
+
+	@Override
+	public Iterator<Node> iterator() {
+		return items.iterator();
 	}
 
 	@Override
@@ -87,7 +94,7 @@ public class ArrayDef implements Value, Array {
 	}
 
 	@Override
-	public Value eval(EvalContext context) {
+	public ArrayDef eval(EvalContext context) {
 		return new ArrayDef(items.stream().map(i -> i.eval(context))
 				.collect(Collectors.toCollection(ArrayList::new)));
 	}

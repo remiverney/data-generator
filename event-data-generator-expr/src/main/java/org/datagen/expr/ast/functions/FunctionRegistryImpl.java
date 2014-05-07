@@ -14,6 +14,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.datagen.expr.ast.CastMatrix;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
@@ -328,8 +329,11 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 
 		Object result = literal.get();
 		if (!clazz.isInstance(result)) {
-			throw new IncompatibleArgumentException(node, parameter,
-					value.getType());
+			result = CastMatrix.cast(result, clazz);
+			if (result == null) {
+				throw new IncompatibleArgumentException(node, parameter,
+						value.getType());
+			}
 		}
 
 		return (T) result;

@@ -26,6 +26,10 @@ public interface Node extends Composite<Node>, Visitable<Node> {
 		return 0;
 	}
 
+	default public Node optimize() {
+		return this;
+	}
+
 	StringBuilder toString(StringBuilder builder,
 			ExpressionFormatContext context);
 }

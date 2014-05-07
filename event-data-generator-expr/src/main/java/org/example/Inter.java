@@ -11,6 +11,7 @@ import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.ast.DefaultValueFormatContext;
 import org.datagen.expr.ast.ValueFormatContext;
+import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.interpreter.Interpreter;
 import org.datagen.expr.interpreter.InterpreterFactory;
@@ -24,7 +25,7 @@ public class Inter {
 
 	public static void main(String[] args) throws FileNotFoundException,
 			CircularDependencyException, UnresolvedDependencyException,
-			IOException {
+			IOException, ParsingException {
 		Map<String, String> library = new HashMap<>();
 		library.put("PI", "3.14159265358979323846");
 		library.put("E", "2.7182818284590452354");
