@@ -11,8 +11,9 @@ import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.factory.Config;
 import org.datagen.utils.EmptyFunction;
+import org.datagen.utils.Observable;
 
-public interface Interpreter {
+public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
 
 	void registerExpression(String column, String expression)
 			throws CircularDependencyException, UnresolvedDependencyException,

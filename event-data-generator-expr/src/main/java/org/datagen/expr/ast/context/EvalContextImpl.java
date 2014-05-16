@@ -1,4 +1,4 @@
-package org.datagen.expr.ast;
+package org.datagen.expr.ast.context;
 
 import java.util.ArrayDeque;
 import java.util.Date;
@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.datagen.expr.DateProvider;
+import org.datagen.expr.ast.Library;
+import org.datagen.expr.ast.LibraryImpl;
+import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.functions.FunctionRegistry;
 import org.datagen.expr.ast.functions.FunctionRegistryImpl;
 import org.datagen.expr.ast.intf.Node;
@@ -17,25 +20,25 @@ import org.datagen.utils.EmptyFunction;
 
 public class EvalContextImpl implements EvalContext {
 
-	private static class Context<T> {
+	static class Context<T> {
 		private final Map<String, T> variables = new HashMap<>();
 
-		private Context() {
+		Context() {
 		}
 
-		private Context(Map<String, T> content) {
+		Context(Map<String, T> content) {
 			this.variables.putAll(content);
 		}
 
-		private T get(String name) {
+		T get(String name) {
 			return variables.get(name);
 		}
 
-		private boolean contains(String name) {
+		boolean contains(String name) {
 			return variables.containsKey(name);
 		}
 
-		private boolean set(String name, T value) {
+		boolean set(String name, T value) {
 			return variables.put(name, value) != null;
 		}
 	}
@@ -99,13 +102,13 @@ public class EvalContextImpl implements EvalContext {
 	}
 
 	@Override
-	public void setField(String field, Value value) {
-		fields.put(field, value);
+	public Value setField(String field, Value value) {
+		return fields.put(field, value);
 	}
 
 	@Override
-	public void unsetField(String field) {
-		fields.remove(field);
+	public Value unsetField(String field) {
+		return fields.remove(field);
 	}
 
 	@Override

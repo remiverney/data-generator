@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -43,7 +43,8 @@ public class Parallel implements Node {
 
 	@Override
 	public Value eval(EvalContext context) {
-		List<Value> intermediate = context.isParallelizable() ? evalParallel(context)
+		List<Value> intermediate = (context.isParallelizable() && expr
+				.getSize() > 1) ? evalParallel(context)
 				: evalSequential(context);
 		if ((reducer != null) && (intermediate.size() > 1)) {
 			Value reducerValue = reducer.eval(context);

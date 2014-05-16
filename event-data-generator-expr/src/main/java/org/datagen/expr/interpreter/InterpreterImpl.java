@@ -17,20 +17,53 @@ import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.DateProvider;
 import org.datagen.expr.SystemDateProvider;
 import org.datagen.expr.ast.DefaultValueFormatContext;
-import org.datagen.expr.ast.EvalContext;
-import org.datagen.expr.ast.EvalContextImpl;
 import org.datagen.expr.ast.ValueFormatContext;
+import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.context.EvalContextImpl;
 import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ForkJoinParallelExecutor;
+import org.datagen.expr.ast.parallel.ParallelExecutor;
 import org.datagen.expr.parser.Parser;
 import org.datagen.expr.parser.ParserResult;
 import org.datagen.factory.Config;
 import org.datagen.factory.ConfigBuilder;
 import org.datagen.utils.DependencyOrder;
 import org.datagen.utils.EmptyFunction;
+import org.datagen.utils.ObservableBase;
 
-public class InterpreterImpl implements Interpreter {
+public class InterpreterImpl extends
+		ObservableBase<Interpreter, InterpreterEvent> implements Interpreter {
+
+	private static final class InterpreterEventImpl implements InterpreterEvent {
+
+		private final String column;
+		private final Value value;
+		private final Value oldValue;
+
+		protected InterpreterEventImpl(String column, Value value,
+				Value oldValue) {
+			this.column = column;
+			this.value = value;
+			this.oldValue = oldValue;
+		}
+
+		@Override
+		public String getColumn() {
+			return this.column;
+		}
+
+		@Override
+		public Value getValue() {
+			return this.value;
+		}
+
+		@Override
+		public Value getOldValue() {
+			return this.oldValue;
+		}
+
+	}
 
 	private static final String COLUMN_NOT_FOUND_MSG = "Unknown colomn '{0}";
 	private static final String COLUMN_ALREADY_EXISTS_MSG = "Column '{0}' is already defined";
@@ -38,21 +71,34 @@ public class InterpreterImpl implements Interpreter {
 	private final Map<String, ParserResult> expressions = new HashMap<>();
 	private final List<String> sorted = new ArrayList<>();
 	private final DateProvider dateProvider;
+	private final ParallelExecutor parallelExecutor;
 	private final ValueFormatContext formatContext;
 	private final EvalContext context;
 	private Config<InterpreterParameters> configuration;
 
 	public InterpreterImpl() {
-		this(new SystemDateProvider(), new DefaultValueFormatContext());
+		this(new ConfigBuilder<InterpreterParameters>().build());
 	}
 
-	public InterpreterImpl(DateProvider dateProvider,
-			ValueFormatContext formatContext) {
+	public InterpreterImpl(Config<InterpreterParameters> configuration) {
+		this(configuration, new SystemDateProvider(),
+				new DefaultValueFormatContext());
+	}
+
+	public InterpreterImpl(Config<InterpreterParameters> configuration,
+			DateProvider dateProvider, ValueFormatContext formatContext) {
 		this.dateProvider = dateProvider;
 		this.formatContext = formatContext;
+		this.configuration = configuration;
+
+		this.parallelExecutor = configuration
+				.isEnabled(InterpreterParameters.ENABLE_PARALLEL) ? new ForkJoinParallelExecutor()
+				: null;
+
 		this.context = new EvalContextImpl(this.dateProvider,
-				this.formatContext, true, new ForkJoinParallelExecutor());
-		this.configuration = new ConfigBuilder<InterpreterParameters>().build();
+				this.formatContext,
+				configuration.isEnabled(InterpreterParameters.ENABLE_PARALLEL),
+				this.parallelExecutor);
 	}
 
 	@Override
@@ -97,21 +143,10 @@ public class InterpreterImpl implements Interpreter {
 	public Map<String, Value> eval() {
 		return sorted.stream().collect(
 				Collectors.toMap(Function.<String> identity(), x -> {
-					//
-					// System.out
-					// .println("print:"
-					// + expressions
-					// .get(x)
-					// .getRoot()
-					// .toString(
-					// new StringBuilder(),
-					// new PrettyExpressionFormatContext()));
-					//
-						Value value = expressions.get(x).getRoot()
-								.eval(context);
-						context.setField(x, value);
-						return value;
-					}));
+					Value value = expressions.get(x).getRoot().eval(context);
+					setField(x, value, true);
+					return value;
+				}));
 	}
 
 	@Override
@@ -123,7 +158,18 @@ public class InterpreterImpl implements Interpreter {
 					COLUMN_NOT_FOUND_MSG, column));
 		}
 
-		return ast.getRoot().eval(context);
+		Value value = ast.getRoot().eval(context);
+		setField(column, value, true);
+
+		return value;
+	}
+
+	private void setField(String column, Value value, boolean notify) {
+		Value old = context.setField(column, value);
+
+		if (notify && super.isObserved()) {
+			super.notify(new InterpreterEventImpl(column, value, old));
+		}
 	}
 
 	@Override

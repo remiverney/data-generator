@@ -14,7 +14,9 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 	ALLOW_LIBRARY_REFERENCE(boolean.class, true),
 	ALLOW_ARRAY(boolean.class, true),
 	ALLOW_PROPERTY_REFERENCE(boolean.class, true),
-	ALLOW_FIELD_REFERENCE(boolean.class, true);
+	ALLOW_FIELD_REFERENCE(boolean.class, true),
+
+	ENABLE_PARALLEL(boolean.class, true);
 
 	private final Class<? extends Serializable> type;
 	private final Serializable defaultValue;

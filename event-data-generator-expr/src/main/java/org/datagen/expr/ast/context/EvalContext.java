@@ -1,9 +1,11 @@
-package org.datagen.expr.ast;
+package org.datagen.expr.ast.context;
 
 import java.util.Date;
 import java.util.Map;
 
 import org.datagen.expr.DateProvider;
+import org.datagen.expr.ast.Library;
+import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.functions.FunctionRegistry;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -26,9 +28,9 @@ public interface EvalContext {
 
 	Value getField(String field);
 
-	void setField(String field, Value value);
+	Value setField(String field, Value value);
 
-	void unsetField(String field);
+	Value unsetField(String field);
 
 	Value getVariable(String variable);
 

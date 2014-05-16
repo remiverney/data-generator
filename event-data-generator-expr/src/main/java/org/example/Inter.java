@@ -14,9 +14,12 @@ import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.interpreter.Interpreter;
+import org.datagen.expr.interpreter.InterpreterEvent;
 import org.datagen.expr.interpreter.InterpreterFactory;
 import org.datagen.expr.interpreter.InterpreterParameters;
 import org.datagen.factory.ConfigBuilder;
+import org.datagen.utils.Observable;
+import org.datagen.utils.Observer;
 
 public class Inter {
 
@@ -69,9 +72,20 @@ public class Inter {
 		inter.registerLibrary("mylib", library);
 		inter.registerExpressionsStream(expressions);
 
+		inter.addObserver(new Observer<Interpreter, InterpreterEvent>() {
+
+			@Override
+			public void notify(
+					Observable<Interpreter, InterpreterEvent> observable,
+					InterpreterEvent event) {
+				System.out.println("event: col=" + event.getColumn() + " val="
+						+ event.getValue() + " old=" + event.getOldValue());
+			}
+		});
+
 		ValueFormatContext format = new DefaultValueFormatContext();
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 3; i++) {
 			Map<String, Value> results = inter.eval();
 
 			results.entrySet()
@@ -82,7 +96,7 @@ public class Inter {
 										+ x.getValue().toValueString(format));
 							});
 
-			inter.nextSequence();
+			// inter.nextSequence();
 		}
 	}
 }

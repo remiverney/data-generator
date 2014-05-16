@@ -2,7 +2,7 @@ package org.datagen.expr.ast.parallel;
 
 import java.util.concurrent.Callable;
 
-import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 

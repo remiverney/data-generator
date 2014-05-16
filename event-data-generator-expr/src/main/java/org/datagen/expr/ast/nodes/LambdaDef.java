@@ -9,11 +9,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.AstWalker;
-import org.datagen.expr.ast.DefaultValueFormatContext;
-import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.ValueFormatContext;
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -120,14 +119,15 @@ public class LambdaDef implements Value, Lambda {
 	private Map<String, Value> defineClosure(EvalContext context) {
 		List<String> references = new ArrayList<>();
 
-		System.out.println("define closure:");
+		// System.out.println("define closure:");
 
 		Visitor<VariableRef> visitor = new Visitor<VariableRef>() {
 			@Override
 			public VariableRef visit(VariableRef visited) {
 				if (!parameters.contains(visited.getReference())) {
 					references.add(visited.getReference());
-					System.out.println("   add ref " + visited.getReference());
+					// System.out.println("   add ref " +
+					// visited.getReference());
 				}
 				return visited;
 			}
@@ -141,15 +141,14 @@ public class LambdaDef implements Value, Lambda {
 				.collect(
 						Collectors.toMap(Function.<String> identity(),
 								x -> context.getVariable(x)));
-		System.out.println("resolved closure:");
-
-		for (Map.Entry<String, Value> entry : closure.entrySet()) {
-			System.out.println("   "
-					+ entry.getKey()
-					+ "="
-					+ entry.getValue().toValueString(
-							new DefaultValueFormatContext()));
-		}
+		// System.out.println("resolved closure:");
+		// for (Map.Entry<String, Value> entry : closure.entrySet()) {
+		// System.out.println("   "
+		// + entry.getKey()
+		// + "="
+		// + entry.getValue().toValueString(
+		// new DefaultValueFormatContext()));
+		// }
 		return closure;
 	}
 

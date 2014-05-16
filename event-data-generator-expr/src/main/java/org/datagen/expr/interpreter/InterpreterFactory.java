@@ -23,10 +23,7 @@ public final class InterpreterFactory implements
 
 	@Override
 	public Interpreter get(Config<InterpreterParameters> config) {
-		Interpreter inter = new InterpreterImpl();
-		inter.setConfiguration(config);
-
-		return inter;
+		return new InterpreterImpl(config);
 	}
 
 	@Override

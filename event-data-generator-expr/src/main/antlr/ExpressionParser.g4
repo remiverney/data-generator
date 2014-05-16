@@ -26,49 +26,49 @@ start returns [Node node]: e=expr EOF
 expr returns [Node node]: p=primary
                           {$node = $p.node;}
                         | e=expr '!'
-                          {$node = new Factorial($e.node);}
+                          {$node = new Factorial($e.node).optimize();}
                         | '+' e=expr
                           {$node = $e.node;}
                         | '-' e=expr
-                          {$node = new Negation($e.node);}
+                          {$node = new Negation($e.node).optimize();}
                         | 'TYPEOF' '(' e=expr ')'
-                          {$node = new TypeOf($e.node);}
+                          {$node = new TypeOf($e.node).optimize();}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=primary '(' el=lambdaexprlist? ')'
-                          {$node = new LambdaCall($l.node, $el.list);}
+                          {$node = new LambdaCall($l.node, $el.list).optimize();}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr ']'
-                          {$node = new ArrayRef($a.node, $i.node);}
+                          {$node = new ArrayRef($a.node, $i.node).optimize();}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr '..' i2=expr ']'
-                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node);}
+                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node).optimize();}
                         | e=expr '.' Identifier
-                          {$node = new AttrRef($e.node, $Identifier.text);}
+                          {$node = new AttrRef($e.node, $Identifier.text).optimize();}
                         | e1=expr '^' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW);}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW).optimize();}
                         | e1=expr { Arithmetic op = null; } ('*' {op = Arithmetic.MUL;} | '/' {op = Arithmetic.DIV;} | '%' {op = Arithmetic.MOD;}) e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, op);}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize();}
                         | e1=expr { Arithmetic op = null; } ('+' {op = Arithmetic.ADD;} | '-' {op = Arithmetic.SUB;}) e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, op);}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize();}
                         | e1=expr '<=' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS_EQUAL);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS_EQUAL).optimize();}
                         | e1=expr '>=' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER_EQUAL);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER_EQUAL).optimize();}
                         | e1=expr '<' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS).optimize();}
                         | e1=expr '>' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER).optimize();}
                         | e1=expr ('=' | '==') e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.EQUAL);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.EQUAL).optimize();}
                         | e1=expr ('!=' | '<>') e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL);}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL).optimize();}
                         | ('!' | 'NOT') e=expr
-                          {$node = new Not($e.node);}
+                          {$node = new Not($e.node).optimize();}
                         | e1=expr ('AND' | '&&') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.AND);}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.AND).optimize();}
                         | e1=expr ('OR' | '||') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.OR);}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.OR).optimize();}
                         | e1=expr ('XOR' | '^^') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.XOR);}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.XOR).optimize();}
                         | <assoc=right> e1=expr '?' e2=expr ':' e3=expr
-                          {$node = new Ternary($e1.node, $e2.node, $e3.node);}
+                          {$node = new Ternary($e1.node, $e2.node, $e3.node).optimize();}
 ;
 
 whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
@@ -82,25 +82,25 @@ primary returns [Node node]: '(' e=expr ')'
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=lambda
                              {$node = $l.lambdadef;}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' el=exprlist '}'
-                             {$node = new ArrayDef($el.list);}
+                             {$node = new ArrayDef($el.list).optimize();}
                            | IntegerConstant
-                             {$node = new LiteralValue(Long.parseLong($IntegerConstant.text));}
+                             {$node = new LiteralValue(Long.parseLong($IntegerConstant.text)).optimize();}
                            | DecimalFloatingConstant
-                             {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text));}
+                             {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)).optimize();}
                            | StringLiteral
-                             {$node = new LiteralValue($StringLiteral.text.substring(1, $StringLiteral.text.length() - 1));}
+                             {$node = new LiteralValue($StringLiteral.text.substring(1, $StringLiteral.text.length() - 1)).optimize();}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref
                              {$node = $col.fieldref;}
                            | Identifier
-                             {$node = new VariableRef($Identifier.text);}
+                             {$node = new VariableRef($Identifier.text).optimize();}
                            | 'this'
-                             {$node = new ThisRef();}
+                             {$node = new ThisRef().optimize();}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? lib=Identifier ':' entry=Identifier
-                             {$node = new LibraryRef($lib.text, $entry.text);}
+                             {$node = new LibraryRef($lib.text, $entry.text).optimize();}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_PROPERTY_REFERENCE)}? '$' Identifier
-                             {$node = new PropertyRef($Identifier.text);}
+                             {$node = new PropertyRef($Identifier.text).optimize();}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FUNCTION)}? ':' Identifier '(' el=exprlist ')'
-                             {$node = new FunctionCall($Identifier.text, $el.list);}
+                             {$node = new FunctionCall($Identifier.text, $el.list).optimize();}
                            | 'true'
                              {$node = LiteralValue.TRUE;}
                            | 'false'
@@ -108,7 +108,7 @@ primary returns [Node node]: '(' e=expr ')'
                            | 'CASE' {Node test = null; Node otherwise = null;} (case_=expr {test = $case_.node;})?
                              {List<CaseWhen> cases = new ArrayList<>();} (when=whenspec {cases.add($when.node);})*
                              ('ELSE' else_=expr {otherwise = $else_.node; } )? 'END'
-                             {$node = new Case(test, cases, otherwise);}
+                             {$node = new Case(test, cases, otherwise).optimize();}
 ;
 
 columnref returns [FieldRef fieldref]: '@' Identifier

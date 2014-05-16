@@ -1,6 +1,6 @@
 package org.datagen.expr.ast.intf;
 
-import org.datagen.expr.ast.EvalContext;
+import org.datagen.expr.ast.context.EvalContext;
 
 public interface Operator<T> {
 

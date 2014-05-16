@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.datagen.expr.ast.Array;
-import org.datagen.expr.ast.EvalContext;
 import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.IncompatibleAttributeException;
 import org.datagen.expr.ast.exception.UnknownAttributeException;
 import org.datagen.expr.ast.intf.Node;
