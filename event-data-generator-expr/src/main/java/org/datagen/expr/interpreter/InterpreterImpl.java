@@ -30,12 +30,15 @@ import org.datagen.factory.Config;
 import org.datagen.factory.ConfigBuilder;
 import org.datagen.utils.DependencyOrder;
 import org.datagen.utils.EmptyFunction;
+import org.datagen.utils.MergeCollectors;
 import org.datagen.utils.ObservableBase;
 
 public class InterpreterImpl extends
 		ObservableBase<Interpreter, InterpreterEvent> implements Interpreter {
 
 	private static final class InterpreterEventImpl implements InterpreterEvent {
+
+		private static final long serialVersionUID = 1L;
 
 		private final String column;
 		private final Value value;
@@ -291,12 +294,13 @@ public class InterpreterImpl extends
 										})));
 
 		if (!embedded.isEmpty()) {
-			// ParsingException exception = new ParsingException(
-			// "Parsing of one or more library expressions failed",
-			// embedded.stream().map(x -> x.getEmbedded())
-			// .collect(Collectors.toCollection(ArrayList::new)));
-
-			// throw exception;
+			throw new ParsingException(
+					"Parsing of one or more library expressions failed",
+					embedded.stream()
+							.map(x -> x.getEmbedded())
+							.collect(
+									MergeCollectors
+											.toCollection(ArrayList::new)));
 		}
 	}
 

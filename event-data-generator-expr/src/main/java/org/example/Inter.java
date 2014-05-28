@@ -53,6 +53,7 @@ public class Inter {
 				"(x -> x.length <= 1  ? x : (this(mylib:filter(x[1 .. x.length - 1], (y -> y < x[0])))) + {x[0]})");
 		library.put("qsort2",
 				"(k -> mylib:filter(k[1 .. k.length - 1], (z -> z < k[0])))");
+		library.put("arrayrand", "(x -> x[:labs(:lrandom()) % x.length])");
 		Map<String, InputStream> expressions = new HashMap<>();
 		// expressions.put("col1",
 		// new FileInputStream("src/main/antlr/sample.txt"));
@@ -78,14 +79,15 @@ public class Inter {
 			public void notify(
 					Observable<Interpreter, InterpreterEvent> observable,
 					InterpreterEvent event) {
-				System.out.println("event: col=" + event.getColumn() + " val="
-						+ event.getValue() + " old=" + event.getOldValue());
+				// System.out.println("event: col=" + event.getColumn() +
+				// " val="
+				// + event.getValue() + " old=" + event.getOldValue());
 			}
 		});
 
 		ValueFormatContext format = new DefaultValueFormatContext();
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 1; i++) {
 			Map<String, Value> results = inter.eval();
 
 			results.entrySet()

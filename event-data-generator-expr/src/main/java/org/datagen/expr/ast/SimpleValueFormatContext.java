@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 public class SimpleValueFormatContext implements ValueFormatContext {
 
+	private static final long serialVersionUID = 1L;
+
 	public SimpleValueFormatContext() {
 	}
 

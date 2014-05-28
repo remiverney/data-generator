@@ -2,6 +2,7 @@ package org.datagen.expr.interpreter;
 
 import java.io.Serializable;
 
+import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.factory.BuilderParameter;
 
 public enum InterpreterParameters implements BuilderParameter<Serializable> {
@@ -16,7 +17,9 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 	ALLOW_PROPERTY_REFERENCE(boolean.class, true),
 	ALLOW_FIELD_REFERENCE(boolean.class, true),
 
-	ENABLE_PARALLEL(boolean.class, true);
+	ENABLE_PARALLEL(boolean.class, true),
+	ENABLE_AGGRESSIVE_OPTIMIZATIONS(boolean.class, false),
+	OPTIMIZER_FORMATTER(ValueFormatContext.class, null);
 
 	private final Class<? extends Serializable> type;
 	private final Serializable defaultValue;

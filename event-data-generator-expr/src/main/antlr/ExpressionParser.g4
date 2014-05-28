@@ -88,7 +88,7 @@ primary returns [Node node]: '(' e=expr ')'
                            | DecimalFloatingConstant
                              {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)).optimize();}
                            | StringLiteral
-                             {$node = new LiteralValue($StringLiteral.text.substring(1, $StringLiteral.text.length() - 1)).optimize();}
+                             {String string = $StringLiteral.text; $node = new LiteralValue(string == null ? "" : string.substring(1, string.length() - 1)).optimize();}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref
                              {$node = $col.fieldref;}
                            | Identifier

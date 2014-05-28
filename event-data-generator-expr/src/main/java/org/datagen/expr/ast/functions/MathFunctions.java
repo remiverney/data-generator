@@ -31,12 +31,12 @@ public final class MathFunctions {
 	private MathFunctions() {
 	}
 
-	@NonDeterministc
+	@NonDeterministic
 	public static final EmptyFunction<Double> random = StaticRandom::nextDouble;
-	@NonDeterministc
+	@NonDeterministic
 	public static final EmptyFunction<Long> lrandom = StaticRandom::nextLong;
 
-	@NonDeterministc
+	@NonDeterministic
 	public static final EmptyFunction<Double> gaussian = StaticRandom::nextGaussian;
 
 	public static final Function<Double, Double> abs = Math::abs;

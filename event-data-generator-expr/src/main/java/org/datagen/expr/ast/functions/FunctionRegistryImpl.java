@@ -36,11 +36,26 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		Value bridge(Node node, List<Value> parameters);
 	}
 
-	public static class EmptyFunctionCallBridge<R> implements CallBridge {
+	public static abstract class BaseCallBridge implements CallBridge {
+
+		private final boolean deterministic;
+
+		public BaseCallBridge(boolean deterministic) {
+			this.deterministic = deterministic;
+		}
+
+		public boolean isDeterministic() {
+			return this.deterministic;
+		}
+	}
+
+	public static class EmptyFunctionCallBridge<R> extends BaseCallBridge {
 
 		private final EmptyFunction<R> function;
 
-		private EmptyFunctionCallBridge(EmptyFunction<R> function) {
+		private EmptyFunctionCallBridge(boolean deterministic,
+				EmptyFunction<R> function) {
+			super(deterministic);
 			this.function = function;
 		}
 
@@ -55,12 +70,14 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	public static class FunctionCallBridge<T, R> implements CallBridge {
+	public static class FunctionCallBridge<T, R> extends BaseCallBridge {
 
 		private final Function<T, R> function;
 		private final Class<T> clazz1;
 
-		private FunctionCallBridge(Function<T, R> function, Class<T> clazz1) {
+		private FunctionCallBridge(boolean deterministic,
+				Function<T, R> function, Class<T> clazz1) {
+			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
 		}
@@ -77,14 +94,15 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	public static class BiFunctionCallBridge<T, U, R> implements CallBridge {
+	public static class BiFunctionCallBridge<T, U, R> extends BaseCallBridge {
 
 		private final BiFunction<T, U, R> function;
 		private final Class<T> clazz1;
 		private final Class<U> clazz2;
 
-		private BiFunctionCallBridge(BiFunction<T, U, R> function,
-				Class<T> clazz1, Class<U> clazz2) {
+		private BiFunctionCallBridge(boolean deterministic,
+				BiFunction<T, U, R> function, Class<T> clazz1, Class<U> clazz2) {
+			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
 			this.clazz2 = clazz2;
@@ -103,15 +121,18 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	public static class TriFunctionCallBridge<T, U, V, R> implements CallBridge {
+	public static class TriFunctionCallBridge<T, U, V, R> extends
+			BaseCallBridge {
 
 		private final TriFunction<T, U, V, R> function;
 		private final Class<T> clazz1;
 		private final Class<U> clazz2;
 		private final Class<V> clazz3;
 
-		private TriFunctionCallBridge(TriFunction<T, U, V, R> function,
-				Class<T> clazz1, Class<U> clazz2, Class<V> clazz3) {
+		private TriFunctionCallBridge(boolean deterministic,
+				TriFunction<T, U, V, R> function, Class<T> clazz1,
+				Class<U> clazz2, Class<V> clazz3) {
+			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
 			this.clazz2 = clazz2;
@@ -132,13 +153,14 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	public static class VarArgFunctionCallBridge<T, R> implements CallBridge {
+	public static class VarArgFunctionCallBridge<T, R> extends BaseCallBridge {
 
 		private final VarArgFunction<T, R> function;
 		private final Class<T> clazz1;
 
-		private VarArgFunctionCallBridge(VarArgFunction<T, R> function,
-				Class<T> clazz1) {
+		private VarArgFunctionCallBridge(boolean deterministic,
+				VarArgFunction<T, R> function, Class<T> clazz1) {
+			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
 		}
@@ -222,28 +244,31 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 
 		ParameterizedType parameterized = (ParameterizedType) type;
+		boolean deterministic = !field.getDeclaringClass().isAnnotationPresent(
+				NonDeterministic.class)
+				&& !field.isAnnotationPresent(NonDeterministic.class);
 
 		if (parameterized.getRawType() == EmptyFunction.class) {
-			return new EmptyFunctionCallBridge<>(
+			return new EmptyFunctionCallBridge<>(deterministic,
 					(EmptyFunction<Object>) field.get(null));
 		} else if (parameterized.getRawType() == Function.class) {
-			return new FunctionCallBridge<>(
+			return new FunctionCallBridge<>(deterministic,
 					(Function<Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0]);
 		} else if (parameterized.getRawType() == BiFunction.class) {
-			return new BiFunctionCallBridge<>(
+			return new BiFunctionCallBridge<>(deterministic,
 					(BiFunction<Object, Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0],
 					(Class<Object>) parameterized.getActualTypeArguments()[1]);
 		} else if (parameterized.getRawType() == TriFunction.class) {
-			return new TriFunctionCallBridge<>(
+			return new TriFunctionCallBridge<>(deterministic,
 					(TriFunction<Object, Object, Object, Object>) field
 							.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0],
 					(Class<Object>) parameterized.getActualTypeArguments()[1],
 					(Class<Object>) parameterized.getActualTypeArguments()[2]);
 		} else if (parameterized.getRawType() == VarArgFunction.class) {
-			return new VarArgFunctionCallBridge<>(
+			return new VarArgFunctionCallBridge<>(deterministic,
 					(VarArgFunction<Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0]);
 		} else {

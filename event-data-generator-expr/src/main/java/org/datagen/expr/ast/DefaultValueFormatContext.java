@@ -7,6 +7,8 @@ import java.util.Locale;
 
 public class DefaultValueFormatContext extends SimpleValueFormatContext {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final Locale DEFAULT_LOCALE = Locale.US;
 
 	private static final DateFormat DEFAULT_DATE_FORMAT = DateFormat
