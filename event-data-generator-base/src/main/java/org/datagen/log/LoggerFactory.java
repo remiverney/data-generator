@@ -1,4 +1,4 @@
-package org.datagen.utils;
+package org.datagen.log;
 
 public class LoggerFactory implements org.apache.log4j.spi.LoggerFactory {
 

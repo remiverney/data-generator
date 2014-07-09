@@ -21,6 +21,10 @@
   		<groupId>log4j</groupId>
   		<artifactId>log4j</artifactId>
   	</dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+	</dependency>
   	<dependency>
   		<groupId>org.eventdatagen</groupId>
   		<artifactId>event-data-generator-base</artifactId>

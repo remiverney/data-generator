@@ -10,6 +10,7 @@
 
 	<properties>
 		<generator-version>0.0.1-SNAPSHOT</generator-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
@@ -100,6 +101,11 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.11</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -107,6 +113,7 @@
 		<module>event-data-generator-base</module>
 		<module>event-data-generator-expr</module>
 		<module>event-data-generator-emitter</module>
+		<module>event-data-generator-core</module>
 		<module>event-data-generator-ui</module>
 	</modules>
 </project>

@@ -2,7 +2,7 @@ package org.datagen.dataset;
 
 import java.io.Serializable;
 
-public interface DataRecord {
+public interface DataRecord extends Serializable {
 
 	DataDefinition getDefinition();
 

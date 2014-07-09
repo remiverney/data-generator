@@ -4,7 +4,7 @@
   <name>Event data generator UI</name>
   
   <properties>
-  	<eclipse.home>c:/Program Files/Java/eclipse 4.4M6</eclipse.home>
+  	<eclipse.home>c:/Program Files/Java/eclipse</eclipse.home>
   </properties>
   
   <parent>
@@ -34,42 +34,42 @@
   		<artifactId>swt</artifactId>
   		<scope>system</scope>
   		<version>3.103.0.v20140305</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.swt.win32.win32.x86_64_3.103.0.v20140305-1110.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.swt.win32.win32.x86_64_3.103.0.v20140605-2012.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>jface</artifactId>
   		<scope>system</scope>
   		<version>3.10.0.v20140303</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.jface_3.10.0.v20140303-1751.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.jface_3.10.0.v20140604-0740.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>jface-text</artifactId>
   		<scope>system</scope>
   		<version>3.10.0.v20140303</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.jface.text_3.9.0.v20131210-1348.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.jface.text_3.9.0.v20140521-1657.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>core-commands</artifactId>
   		<scope>system</scope>
   		<version>3.6.100.v20140219</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.core.commands_3.6.100.v20140219-1520.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.core.commands_3.6.100.v20140528-1422.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>core-runtime</artifactId>
   		<scope>system</scope>
   		<version>3.10.0.v20140221</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.core.runtime_3.10.0.v20140221-2027.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.core.runtime_3.10.0.v20140318-2214.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>ui_forms</artifactId>
   		<scope>system</scope>
   		<version>3.6.100.v20140213</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.ui.forms_3.6.100.v20140213-1440.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.ui.forms_3.6.100.v20140422-1825.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
@@ -83,14 +83,14 @@
   		<artifactId>equinox-registry</artifactId>
   		<scope>system</scope>
   		<version>3.5.400.v20140224</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.equinox.registry_3.5.400.v20140224-1517.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.equinox.registry_3.5.400.v20140428-1507.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eclipse</groupId>
   		<artifactId>osgi</artifactId>
   		<scope>system</scope>
   		<version>3.10.0.v20140305</version>
-  		<systemPath>${eclipse.home}/plugins/org.eclipse.osgi_3.10.0.v20140305-1523.jar</systemPath>
+  		<systemPath>${eclipse.home}/plugins/org.eclipse.osgi_3.10.0.v20140606-1445.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.eventdatagen</groupId>

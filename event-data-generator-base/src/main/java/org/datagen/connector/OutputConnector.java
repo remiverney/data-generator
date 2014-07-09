@@ -11,11 +11,10 @@ import org.datagen.factory.Config;
 import org.datagen.utils.Observable;
 
 public interface OutputConnector<O extends OutputConnector<O, E>, E extends ConnectorEvent>
-		extends Closeable, Observable<O, E>, PluggableExtension {
+		extends Closeable, Observable<O, E>, PluggableExtension,
+		Emitter<DataRecord> {
 
 	Config<? extends BuilderParameter<Serializable>> getConfiguration();
-
-	void emit(DataRecord record) throws IOException;
 
 	default void suspend() {
 	}

@@ -59,6 +59,8 @@ public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
 
 	Value eval(String column);
 
+	Map<String, String> evalToString();
+
 	void clear();
 
 	void setSequence(long sequence);

@@ -9,10 +9,7 @@ import java.util.Map;
 
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
-import org.datagen.expr.ast.DefaultValueFormatContext;
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.exception.ParsingException;
-import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.interpreter.Interpreter;
 import org.datagen.expr.interpreter.InterpreterEvent;
 import org.datagen.expr.interpreter.InterpreterFactory;
@@ -85,18 +82,12 @@ public class Inter {
 			}
 		});
 
-		ValueFormatContext format = new DefaultValueFormatContext();
-
 		for (int i = 0; i < 1; i++) {
-			Map<String, Value> results = inter.eval();
+			Map<String, String> results = inter.evalToString();
 
-			results.entrySet()
-					.stream()
-					.forEach(
-							x -> {
-								System.out.println(x.getKey() + " = "
-										+ x.getValue().toValueString(format));
-							});
+			results.entrySet().stream().forEach(x -> {
+				System.out.println(x.getKey() + " = " + x.getValue());
+			});
 
 			// inter.nextSequence();
 		}

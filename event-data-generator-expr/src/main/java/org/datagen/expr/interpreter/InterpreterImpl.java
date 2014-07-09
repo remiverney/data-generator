@@ -153,6 +153,16 @@ public class InterpreterImpl extends
 	}
 
 	@Override
+	public Map<String, String> evalToString() {
+		return sorted.stream().collect(
+				Collectors.toMap(Function.<String> identity(), x -> {
+					Value value = expressions.get(x).getRoot().eval(context);
+					setField(x, value, true);
+					return value.toValueString(formatContext);
+				}));
+	}
+
+	@Override
 	public Value eval(String column) {
 		ParserResult ast = expressions.get(column);
 

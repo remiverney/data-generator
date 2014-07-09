@@ -1,4 +1,4 @@
-package org.datagen.utils;
+package org.datagen.log;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -6,6 +6,7 @@ import org.apache.log4j.Priority;
 
 public class Logger extends org.apache.log4j.Logger {
 
+	private static final LoggerResolver<org.apache.log4j.Logger> LOGGER_RESOLVER = LogManager::getLogger;
 	private static final LoggerFactory DEFAULT_FACTORY = new LoggerFactory(null);
 
 	@FunctionalInterface
@@ -18,11 +19,11 @@ public class Logger extends org.apache.log4j.Logger {
 	}
 
 	public static Logger getLogger(String name) {
-		return (Logger) LogManager.getLogger(name, DEFAULT_FACTORY);
+		return (Logger) LOGGER_RESOLVER.resolve(name, DEFAULT_FACTORY);
 	}
 
 	public static Logger getLogger(@SuppressWarnings("rawtypes") Class clazz) {
-		return (Logger) LogManager.getLogger(clazz.getName(), DEFAULT_FACTORY);
+		return getLogger(clazz.getName());
 	}
 
 	public void debug(Log<?> message) {
