@@ -68,6 +68,7 @@ public class EvalContextImpl implements EvalContext {
 		setProperty(PROPERTY_SEQUENCE, () -> new LiteralValue(sequence));
 		setProperty(PROPERTY_TIME,
 				() -> new LiteralValue(dateProvider.getDate()));
+		setProperty(PROPERTY_STARTTIME, new LiteralValue(new Date()));
 
 		pushContext();
 	}

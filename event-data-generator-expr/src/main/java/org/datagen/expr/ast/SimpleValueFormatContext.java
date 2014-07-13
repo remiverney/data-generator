@@ -43,4 +43,16 @@ public class SimpleValueFormatContext implements ValueFormatContext {
 				.collect(Collectors.joining(", ", "{ ", " }"));
 	}
 
+	@Override
+	public String formatMapped(Mapped mapped) {
+		return mapped
+				.getAll()
+				.entrySet()
+				.stream()
+				.sequential()
+				.map(x -> x.getKey().eval(null).toValueString(this) + " => "
+						+ x.getValue().eval(null).toValueString(this))
+				.collect(Collectors.joining(", ", "{ ", " }"));
+	}
+
 }

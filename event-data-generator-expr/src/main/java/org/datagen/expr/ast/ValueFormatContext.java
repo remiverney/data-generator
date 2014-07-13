@@ -20,4 +20,6 @@ public interface ValueFormatContext extends Serializable {
 	String formatLambda(Lambda lambda);
 
 	String formatArray(Array array);
+
+	String formatMapped(Mapped mapped);
 }

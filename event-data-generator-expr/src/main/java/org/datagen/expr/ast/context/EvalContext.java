@@ -18,6 +18,8 @@ public interface EvalContext {
 
 	String PROPERTY_TIME = "time";
 
+	String PROPERTY_STARTTIME = "starttime";
+
 	Value getProperty(String property);
 
 	void setProperty(String property, Value value);

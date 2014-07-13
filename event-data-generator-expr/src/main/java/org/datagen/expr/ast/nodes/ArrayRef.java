@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.Mapped;
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.NotAnArrayException;
@@ -38,13 +39,16 @@ public class ArrayRef implements Node {
 	public Value eval(EvalContext context) {
 		Value resolved = array.eval(context);
 
-		if (!resolved.isArray()) {
+		switch (resolved.getType()) {
+		case ARRAY:
+			return ((Array) resolved).get(
+					ValueOperation.evalInteger(context, this,
+							index.eval(context))).eval(context);
+		case MAPPED:
+			return ((Mapped) resolved).get(index.eval(context)).eval(context);
+		default:
 			throw new NotAnArrayException(this, resolved.getType());
 		}
-
-		return ((Array) resolved).get(
-				ValueOperation.evalInteger(context, this, index.eval(context)))
-				.eval(context);
 	}
 
 	@Override

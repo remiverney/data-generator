@@ -142,4 +142,60 @@ public class LiteralValue implements Value {
 	public static LiteralValue from(boolean bool) {
 		return bool ? TRUE : FALSE;
 	}
+
+	@Override
+	public int hashCode() {
+		switch (type) {
+		case BOOLEAN:
+			return Boolean.hashCode(bool);
+		case DATE_TIME:
+			return date.hashCode();
+		case INTEGER:
+			return Long.hashCode(integer);
+		case REAL:
+			return Double.hashCode(real);
+		case STRING:
+			return string.hashCode();
+		default:
+			throw new IllegalArgumentException(
+					"Unexpected literal value type [ " + type + " ]");
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+
+		LiteralValue other = (LiteralValue) obj;
+
+		if (type != other.getType()) {
+			return false;
+		}
+
+		switch (type) {
+		case BOOLEAN:
+			return bool == other.getBool();
+		case DATE_TIME:
+			return date.equals(other.getDate());
+		case INTEGER:
+			return integer == other.getInteger();
+		case REAL:
+			return real == other.getReal();
+		case STRING:
+			return string.equals(other.getString());
+		default:
+			throw new IllegalArgumentException(
+					"Unexpected literal value type [ " + type + " ]");
+		}
+	}
 }

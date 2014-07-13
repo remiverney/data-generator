@@ -9,6 +9,10 @@ public interface Value extends Node {
 		return this;
 	}
 
+	default public boolean isMapped() {
+		return false;
+	}
+
 	default public boolean isArray() {
 		return false;
 	}

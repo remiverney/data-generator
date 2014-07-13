@@ -1,6 +1,5 @@
 package org.datagen.expr.ast.intf;
 
-
 public enum ValueType {
 
 	INTEGER("integer"),
@@ -9,7 +8,8 @@ public enum ValueType {
 	DATE_TIME("date"),
 	BOOLEAN("boolean"),
 	LAMBDA("lambda"),
-	ARRAY("array");
+	ARRAY("array"),
+	MAPPED("mapped");
 
 	private final String typeName;
 

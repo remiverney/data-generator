@@ -11,6 +11,6 @@ public class SystemDateProvider implements DateProvider {
 
 	@Override
 	public @Nonnull Date getDate() {
-		return null;
+		return new Date();
 	}
 }

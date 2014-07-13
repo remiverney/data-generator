@@ -1,5 +1,7 @@
 package org.datagen.expr.ast;
 
+import java.util.function.Consumer;
+
 import org.datagen.expr.ast.intf.Node;
 
 public interface ExpressionFormatContext {
@@ -11,6 +13,9 @@ public interface ExpressionFormatContext {
 
 	StringBuilder formatListString(StringBuilder builder,
 			Iterable<String> list, char separator);
+
+	<T> StringBuilder formatList(StringBuilder builder, Iterable<T> list,
+			char separator, Consumer<T> action);
 
 	StringBuilder spacing(StringBuilder builder);
 

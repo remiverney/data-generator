@@ -34,7 +34,8 @@ public class PrettyExpressionFormatContext implements ExpressionFormatContext {
 		return formatList(builder, list, separator, x -> builder.append(x));
 	}
 
-	private <T> StringBuilder formatList(StringBuilder builder,
+	@Override
+	public <T> StringBuilder formatList(StringBuilder builder,
 			Iterable<T> list, char separator, Consumer<T> action) {
 		boolean first = true;
 

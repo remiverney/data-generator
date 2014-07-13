@@ -83,6 +83,8 @@ primary returns [Node node]: '(' e=expr ')'
                              {$node = $l.lambdadef;}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' el=exprlist '}'
                              {$node = new ArrayDef($el.list).optimize();}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' mapped=mappedexprlist '}'
+                             {$node = new MappedDef($mapped.map).optimize();}
                            | IntegerConstant
                              {$node = new LiteralValue(Long.parseLong($IntegerConstant.text)).optimize();}
                            | DecimalFloatingConstant
@@ -125,6 +127,10 @@ lambda returns [LambdaDef lambdadef]: '('
 
 exprlist returns [List<Node> list]: {$list = new ArrayList<Node>();}
                                    (e1=expr {$list.add($e1.node);})? (',' e2=expr {$list.add($e2.node);} )*
+;
+
+mappedexprlist returns [Map<Node, Node> map]: {$map = new LinkedHashMap<Node, Node>();}
+                                   (k=expr '=>' v=expr {$map.put($k.node, $v.node);})? (',' k=expr '=>' v=expr {$map.put($k.node, $v.node);} )*
 ;
 
 lambdaexprlist returns [List<Node> list]: {$list = new ArrayList<Node>();}

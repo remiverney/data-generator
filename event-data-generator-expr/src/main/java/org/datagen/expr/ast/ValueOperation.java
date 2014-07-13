@@ -126,6 +126,9 @@ public strictfp final class ValueOperation {
 			case INTEGER:
 				return new LiteralValue(new Date(((LiteralValue) v1).getDate()
 						.getTime() - ((LiteralValue) v2).getInteger()));
+			case DATE_TIME:
+				return new LiteralValue(((LiteralValue) v1).getDate().getTime()
+						- ((LiteralValue) v2).getDate().getTime());
 			default:
 				throw new IncompatibleTypesException(operator, Arithmetic.SUB,
 						v1, v2);

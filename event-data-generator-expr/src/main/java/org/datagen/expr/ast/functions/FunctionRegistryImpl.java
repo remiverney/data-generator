@@ -304,7 +304,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 
 		if (literal.getClass() == Boolean.class) {
-			return new LiteralValue((Boolean) literal);
+			return LiteralValue.from((Boolean) literal);
 		}
 
 		if (literal.getClass() == Date.class) {
