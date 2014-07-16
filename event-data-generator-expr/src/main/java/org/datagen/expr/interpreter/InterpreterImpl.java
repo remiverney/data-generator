@@ -101,7 +101,7 @@ public class InterpreterImpl extends
 		this.context = new EvalContextImpl(this.dateProvider,
 				this.formatContext,
 				configuration.isEnabled(InterpreterParameters.ENABLE_PARALLEL),
-				this.parallelExecutor);
+				this.parallelExecutor, this);
 	}
 
 	@Override
@@ -322,6 +322,11 @@ public class InterpreterImpl extends
 	@Override
 	public void setConfiguration(Config<InterpreterParameters> configuration) {
 		this.configuration = configuration;
+	}
+
+	@Override
+	public Config<InterpreterParameters> getConfiguration() {
+		return this.configuration;
 	}
 
 	@Override

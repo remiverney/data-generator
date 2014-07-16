@@ -55,6 +55,8 @@ public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
 
 	void setConfiguration(Config<InterpreterParameters> configuration);
 
+	Config<InterpreterParameters> getConfiguration();
+
 	Map<String, Value> eval();
 
 	Value eval(String column);

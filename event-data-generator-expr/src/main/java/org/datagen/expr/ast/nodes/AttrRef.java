@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.Mapped;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.IncompatibleAttributeException;
@@ -15,6 +16,7 @@ import org.datagen.expr.ast.intf.Value;
 
 public class AttrRef implements Node {
 	private static enum Attribute {
+		TYPE,
 		LENGTH,
 		YEAR,
 		MONTH,
@@ -25,7 +27,8 @@ public class AttrRef implements Node {
 		HOUR,
 		MINUTE,
 		SECOND,
-		MILLISECOND;
+		MILLISECOND,
+		ARITY;
 
 		private String identifier() {
 			return name().toLowerCase();
@@ -54,22 +57,26 @@ public class AttrRef implements Node {
 	public Value eval(EvalContext context) {
 		Value value = expr.eval(context);
 
+		if (attribute == Attribute.TYPE) {
+			return new LiteralValue(value.getType().getTypeName());
+		}
+
 		switch (value.getType()) {
 		case ARRAY:
 			switch (attribute) {
 			case LENGTH:
 				return new LiteralValue(((Array) value).getSize());
 			default:
-				throw new IllegalArgumentException(
-						"Unexpected expression attribute '" + attribute + "'");
+				throw new IncompatibleAttributeException(this, value.getType(),
+						attribute.name());
 			}
 		case MAPPED:
 			switch (attribute) {
 			case LENGTH:
 				return new LiteralValue(((Mapped) value).getSize());
 			default:
-				throw new IllegalArgumentException(
-						"Unexpected expression attribute '" + attribute + "'");
+				throw new IncompatibleAttributeException(this, value.getType(),
+						attribute.name());
 			}
 		case DATE_TIME:
 			Calendar calendar = Calendar.getInstance();
@@ -97,8 +104,16 @@ public class AttrRef implements Node {
 			case MILLISECOND:
 				return new LiteralValue(calendar.get(Calendar.MILLISECOND));
 			default:
-				throw new IllegalArgumentException(
-						"Unexpected expression attribute '" + attribute + "'");
+				throw new IncompatibleAttributeException(this, value.getType(),
+						attribute.name());
+			}
+		case LAMBDA:
+			switch (attribute) {
+			case ARITY:
+				return new LiteralValue(((Lambda) value).getArity());
+			default:
+				throw new IncompatibleAttributeException(this, value.getType(),
+						attribute.name());
 			}
 		default:
 			throw new IncompatibleAttributeException(this, value.getType(),

@@ -10,6 +10,7 @@ import org.datagen.expr.ast.functions.FunctionRegistry;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ParallelExecutor;
+import org.datagen.expr.interpreter.Interpreter;
 import org.datagen.utils.EmptyFunction;
 
 public interface EvalContext {
@@ -69,4 +70,6 @@ public interface EvalContext {
 	boolean isParallelizable();
 
 	ParallelExecutor getParallelExecutor();
+
+	Interpreter getInterpreter();
 }

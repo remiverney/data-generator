@@ -6,5 +6,7 @@ public enum Keywords {
 	THEN,
 	ELSE,
 	END,
-	TYPEOF
+	TYPEOF,
+	PARALLEL,
+	EVAL
 }

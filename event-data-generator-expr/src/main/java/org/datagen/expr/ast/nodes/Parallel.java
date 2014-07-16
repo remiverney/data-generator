@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.expr.ast.intf.ValueType;
 
 public class Parallel implements Node {
-
-	private static final String PARALLEL_NAME = "parallel";
 
 	private final ArrayDef expr;
 	private final Node reducer;
@@ -50,7 +50,7 @@ public class Parallel implements Node {
 			Value reducerValue = reducer.eval(context);
 			if (!reducerValue.isLambda()) {
 				throw new IncompatibleArgumentException(this, 2,
-						reducerValue.getType());
+						reducerValue.getType(), ValueType.LAMBDA);
 			}
 
 			Lambda lambda = (Lambda) reducerValue;
@@ -79,7 +79,7 @@ public class Parallel implements Node {
 	@Override
 	public StringBuilder toString(StringBuilder builder,
 			ExpressionFormatContext context) {
-		builder.append(PARALLEL_NAME);
+		context.formatKeyword(builder, Keywords.PARALLEL);
 		builder.append('(');
 		expr.toString(builder, context);
 

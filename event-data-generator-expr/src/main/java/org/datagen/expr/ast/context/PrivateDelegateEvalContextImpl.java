@@ -13,6 +13,7 @@ import org.datagen.expr.ast.functions.FunctionRegistry;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ParallelExecutor;
+import org.datagen.expr.interpreter.Interpreter;
 import org.datagen.utils.EmptyFunction;
 
 public class PrivateDelegateEvalContextImpl implements EvalContext {
@@ -155,6 +156,11 @@ public class PrivateDelegateEvalContextImpl implements EvalContext {
 	@Override
 	public ParallelExecutor getParallelExecutor() {
 		return this.delegate.getParallelExecutor();
+	}
+
+	@Override
+	public Interpreter getInterpreter() {
+		return this.delegate.getInterpreter();
 	}
 
 }

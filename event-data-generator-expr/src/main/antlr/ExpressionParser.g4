@@ -31,8 +31,6 @@ expr returns [Node node]: p=primary
                           {$node = $e.node;}
                         | '-' e=expr
                           {$node = new Negation($e.node).optimize();}
-                        | 'TYPEOF' '(' e=expr ')'
-                          {$node = new TypeOf($e.node).optimize();}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=primary '(' el=lambdaexprlist? ')'
                           {$node = new LambdaCall($l.node, $el.list).optimize();}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr ']'
@@ -77,7 +75,11 @@ whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
 
 primary returns [Node node]: '(' e=expr ')'
                              {$node = $e.node;}
-                           | 'parallel' '(' '{' el=exprlist '}' { Node reducer = null; } ( ',' r=lambdaexpr { reducer = $r.node; } )? ')'
+                           | 'TYPEOF' '(' e=expr ')'
+                             {$node = new TypeOf($e.node).optimize();}
+                           | 'EVAL' '(' e=expr ')'
+                             {$node = new Eval($e.node).optimize();}
+                           | 'PARALLEL' '(' '{' el=exprlist '}' { Node reducer = null; } ( ',' r=lambdaexpr { reducer = $r.node; } )? ')'
                              { $node = new Parallel(new ArrayDef($el.list), reducer); }
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=lambda
                              {$node = $l.lambdadef;}
