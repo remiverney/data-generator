@@ -3,8 +3,8 @@ package org.datagen.expr.ast.intf;
 import java.util.Collections;
 import java.util.List;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 
 public interface Node extends Composite<Node>, Visitable<Node> {
 
@@ -26,7 +26,7 @@ public interface Node extends Composite<Node>, Visitable<Node> {
 		return 0;
 	}
 
-	default public Node optimize() {
+	default public Node optimize(EvalContext context) {
 		return this;
 	}
 

@@ -9,6 +9,8 @@ public interface FunctionRegistry {
 
 	Object getFunction(String name);
 
+	boolean isDeterministic(Node node, String name);
+
 	Value invokeFunction(Node node, String name, List<Value> parameters);
 
 }

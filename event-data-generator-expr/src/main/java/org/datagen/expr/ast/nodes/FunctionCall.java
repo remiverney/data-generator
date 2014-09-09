@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
@@ -50,5 +50,23 @@ public class FunctionCall implements Node {
 		builder.append(')');
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		boolean deterministic = context.getFunctionRegistry().isDeterministic(
+				this, name);
+
+		if (deterministic
+				&& parameters.stream().allMatch(
+						p -> (p instanceof LiteralValue))) {
+			return context.getFunctionRegistry().invokeFunction(
+					this,
+					name,
+					parameters.stream().map(p -> p.eval(context))
+							.collect(Collectors.toCollection(ArrayList::new)));
+		} else {
+			return Node.super.optimize(context);
+		}
 	}
 }

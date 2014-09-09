@@ -2,7 +2,7 @@ package org.datagen.expr.interpreter;
 
 import java.io.Serializable;
 
-import org.datagen.expr.ast.ValueFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.factory.BuilderParameter;
 
 public enum InterpreterParameters implements BuilderParameter<Serializable> {
@@ -14,6 +14,7 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 	ALLOW_FUNCTION(boolean.class, true),
 	ALLOW_LIBRARY_REFERENCE(boolean.class, true),
 	ALLOW_ARRAY(boolean.class, true),
+	ALLOW_MAPPED(boolean.class, true),
 	ALLOW_PROPERTY_REFERENCE(boolean.class, true),
 	ALLOW_FIELD_REFERENCE(boolean.class, true),
 

@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.Array;
-import org.datagen.expr.ast.ExpressionFormatContext;
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.OutBoundsArrayException;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;

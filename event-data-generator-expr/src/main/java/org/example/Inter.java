@@ -82,6 +82,8 @@ public class Inter {
 			}
 		});
 
+		System.out.println("expr: " + inter.get("col5"));
+
 		for (int i = 0; i < 1; i++) {
 			Map<String, String> results = inter.evalToString();
 

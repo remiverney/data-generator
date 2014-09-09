@@ -1,7 +1,7 @@
 package org.datagen.expr.ast.intf;
 
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 
 public interface Value extends Node {
 

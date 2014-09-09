@@ -6,6 +6,14 @@ import org.apache.log4j.Priority;
 
 public class Logger extends org.apache.log4j.Logger {
 
+	@FunctionalInterface
+	public interface LoggerClassResolver {
+		org.apache.log4j.Logger getLogger(
+				@SuppressWarnings("rawtypes") Class clazz);
+	}
+
+	public static final LoggerClassResolver get = Logger::getLogger;
+
 	private static final LoggerResolver<org.apache.log4j.Logger> LOGGER_RESOLVER = LogManager::getLogger;
 	private static final LoggerFactory DEFAULT_FACTORY = new LoggerFactory(null);
 

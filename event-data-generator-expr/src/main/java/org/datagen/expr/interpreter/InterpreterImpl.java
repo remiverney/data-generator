@@ -16,11 +16,12 @@ import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.DateProvider;
 import org.datagen.expr.SystemDateProvider;
-import org.datagen.expr.ast.DefaultValueFormatContext;
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.context.EvalContextImpl;
 import org.datagen.expr.ast.exception.ParsingException;
+import org.datagen.expr.ast.format.DefaultValueFormatContext;
+import org.datagen.expr.ast.format.PrettyExpressionFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ForkJoinParallelExecutor;
 import org.datagen.expr.ast.parallel.ParallelExecutor;
@@ -186,6 +187,22 @@ public class InterpreterImpl extends
 	}
 
 	@Override
+	public String get(String column) {
+		ParserResult ast = expressions.get(column);
+
+		if (ast == null) {
+			throw new IllegalArgumentException(MessageFormat.format(
+					COLUMN_NOT_FOUND_MSG, column));
+		}
+
+		StringBuilder builder = new StringBuilder();
+
+		return ast.getRoot()
+				.toString(builder, new PrettyExpressionFormatContext())
+				.toString();
+	}
+
+	@Override
 	public void clear() {
 		expressions.clear();
 	}
@@ -239,7 +256,7 @@ public class InterpreterImpl extends
 	private void registerExpressionUnchecked(String column, String expression)
 			throws ParsingException {
 		if (expressions.putIfAbsent(column,
-				Parser.parse(expression, configuration)) != null) {
+				Parser.parse(expression, configuration, context)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -247,8 +264,8 @@ public class InterpreterImpl extends
 
 	private void registerExpressionUnchecked(String column, InputStream stream)
 			throws IOException, ParsingException {
-		if (expressions
-				.putIfAbsent(column, Parser.parse(stream, configuration)) != null) {
+		if (expressions.putIfAbsent(column,
+				Parser.parse(stream, configuration, context)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -256,8 +273,8 @@ public class InterpreterImpl extends
 
 	private void registerExpressionUnchecked(String column, Reader reader)
 			throws IOException, ParsingException {
-		if (expressions
-				.putIfAbsent(column, Parser.parse(reader, configuration)) != null) {
+		if (expressions.putIfAbsent(column,
+				Parser.parse(reader, configuration, context)) != null) {
 			throw new IllegalArgumentException(MessageFormat.format(
 					COLUMN_ALREADY_EXISTS_MSG, column));
 		}
@@ -295,7 +312,7 @@ public class InterpreterImpl extends
 											try {
 												return Parser.parse(
 														x.getValue(),
-														configuration)
+														configuration, context)
 														.getRoot();
 											} catch (ParsingException e) {
 												embedded.add(e);

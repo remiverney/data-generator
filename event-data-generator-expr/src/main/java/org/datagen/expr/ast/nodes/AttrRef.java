@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.datagen.expr.ast.Array;
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.Mapped;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.IncompatibleAttributeException;
 import org.datagen.expr.ast.exception.UnknownAttributeException;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
@@ -18,6 +18,7 @@ public class AttrRef implements Node {
 	private static enum Attribute {
 		TYPE,
 		LENGTH,
+		LAST,
 		YEAR,
 		MONTH,
 		WEEK_YEAR,
@@ -28,6 +29,7 @@ public class AttrRef implements Node {
 		MINUTE,
 		SECOND,
 		MILLISECOND,
+		TIME,
 		ARITY;
 
 		private String identifier() {
@@ -63,9 +65,12 @@ public class AttrRef implements Node {
 
 		switch (value.getType()) {
 		case ARRAY:
+			Array array = (Array) value;
 			switch (attribute) {
 			case LENGTH:
-				return new LiteralValue(((Array) value).getSize());
+				return new LiteralValue(array.getSize());
+			case LAST:
+				return array.get(array.getSize() - 1).eval(context);
 			default:
 				throw new IncompatibleAttributeException(this, value.getType(),
 						attribute.name());
@@ -103,6 +108,8 @@ public class AttrRef implements Node {
 				return new LiteralValue(calendar.get(Calendar.SECOND));
 			case MILLISECOND:
 				return new LiteralValue(calendar.get(Calendar.MILLISECOND));
+			case TIME:
+				return new LiteralValue(calendar.getTimeInMillis());
 			default:
 				throw new IncompatibleAttributeException(this, value.getType(),
 						attribute.name());

@@ -3,9 +3,9 @@ package org.datagen.expr.ast.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
@@ -54,6 +54,11 @@ public class CaseWhen implements Node {
 		then.toString(builder, context);
 
 		return builder;
+	}
+
+	@Override
+	public CaseWhen optimize(EvalContext context) {
+		return this;
 	}
 
 }

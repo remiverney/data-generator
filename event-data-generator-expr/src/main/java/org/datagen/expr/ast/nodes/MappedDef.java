@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Mapped;
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.UnknownFieldException;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;

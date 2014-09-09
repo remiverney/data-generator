@@ -3,7 +3,7 @@ package org.datagen.expr.ast.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 

@@ -2,8 +2,8 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.Date;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
-import org.datagen.expr.ast.ValueFormatContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
 

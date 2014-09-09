@@ -61,6 +61,7 @@ public class CsvConnectorTestCase {
 		};
 		connector.open();
 		connector.emit(record);
+		connector.emit(record);
 
 		connector.close();
 	}

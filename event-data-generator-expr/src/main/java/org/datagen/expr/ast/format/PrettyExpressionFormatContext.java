@@ -1,4 +1,4 @@
-package org.datagen.expr.ast;
+package org.datagen.expr.ast.format;
 
 import java.util.function.Consumer;
 

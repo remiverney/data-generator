@@ -3,12 +3,12 @@ package org.datagen.expr.ast.nodes;
 import java.util.Collections;
 import java.util.List;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.DynamicEvaluationException;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.exception.ParsingException;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
@@ -42,7 +42,7 @@ public class Eval implements Node {
 	private Value eval(String string, EvalContext context) {
 		try {
 			ParserResult result = Parser.parse(string, context.getInterpreter()
-					.getConfiguration());
+					.getConfiguration(), context);
 			return result.getRoot().eval(context);
 		} catch (ParsingException e) {
 			throw new DynamicEvaluationException(this, string, e);

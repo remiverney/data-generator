@@ -34,6 +34,8 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 
 	public interface CallBridge {
 		Value bridge(Node node, List<Value> parameters);
+
+		boolean isDeterministic();
 	}
 
 	public static abstract class BaseCallBridge implements CallBridge {
@@ -44,6 +46,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 			this.deterministic = deterministic;
 		}
 
+		@Override
 		public boolean isDeterministic() {
 			return this.deterministic;
 		}
@@ -193,6 +196,17 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 	@Override
 	public Object getFunction(String name) {
 		return functions.get(name);
+	}
+
+	@Override
+	public boolean isDeterministic(Node node, String name) {
+		CallBridge bridge = functions.get(name);
+
+		if (bridge == null) {
+			throw new UnresolvedReferenceException(node, name);
+		}
+
+		return bridge.isDeterministic();
 	}
 
 	@Override

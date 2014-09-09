@@ -2,8 +2,8 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.List;
 
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
@@ -64,5 +64,14 @@ public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends
 		}
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if ((rhs instanceof LiteralValue) && (lhs instanceof LiteralValue)) {
+			return eval(context);
+		} else {
+			return super.optimize(context);
+		}
 	}
 }

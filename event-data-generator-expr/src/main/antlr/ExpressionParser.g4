@@ -11,9 +11,14 @@ import org.datagen.expr.ast.functions.ShortOperators;
 
 @parser::members {
 	private org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration;
+	private org.datagen.expr.ast.context.EvalContext context;
 	
 	public void setConfiguration(org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration) {
 		this.configuration = configuration;
+	}
+	
+	public void setEvalContext(org.datagen.expr.ast.context.EvalContext context) {
+		this.context = context;
 	}
 }
 
@@ -26,85 +31,85 @@ start returns [Node node]: e=expr EOF
 expr returns [Node node]: p=primary
                           {$node = $p.node;}
                         | e=expr '!'
-                          {$node = new Factorial($e.node).optimize();}
+                          {$node = new Factorial($e.node).optimize(context);}
                         | '+' e=expr
                           {$node = $e.node;}
                         | '-' e=expr
-                          {$node = new Negation($e.node).optimize();}
+                          {$node = new Negation($e.node).optimize(context);}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=primary '(' el=lambdaexprlist? ')'
-                          {$node = new LambdaCall($l.node, $el.list).optimize();}
-                        | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr ']'
-                          {$node = new ArrayRef($a.node, $i.node).optimize();}
+                          {$node = new LambdaCall($l.node, $el.list).optimize(context);}
+                        | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY) || configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? a=primary '[' i=expr ']'
+                          {$node = new ArrayRef($a.node, $i.node).optimize(context);}
                         | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr '..' i2=expr ']'
-                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node).optimize();}
+                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node).optimize(context);}
                         | e=expr '.' Identifier
-                          {$node = new AttrRef($e.node, $Identifier.text).optimize();}
+                          {$node = new AttrRef($e.node, $Identifier.text).optimize(context);}
                         | e1=expr '^' e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW).optimize();}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW).optimize(context);}
                         | e1=expr { Arithmetic op = null; } ('*' {op = Arithmetic.MUL;} | '/' {op = Arithmetic.DIV;} | '%' {op = Arithmetic.MOD;}) e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize();}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize(context);}
                         | e1=expr { Arithmetic op = null; } ('+' {op = Arithmetic.ADD;} | '-' {op = Arithmetic.SUB;}) e2=expr
-                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize();}
+                          {$node = new ArithmeticOp($e1.node, $e2.node, op).optimize(context);}
                         | e1=expr '<=' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS_EQUAL).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS_EQUAL).optimize(context);}
                         | e1=expr '>=' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER_EQUAL).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER_EQUAL).optimize(context);}
                         | e1=expr '<' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.LESS).optimize(context);}
                         | e1=expr '>' e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.GREATER).optimize(context);}
                         | e1=expr ('=' | '==') e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.EQUAL).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.EQUAL).optimize(context);}
                         | e1=expr ('!=' | '<>') e2=expr
-                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL).optimize();}
+                          {$node = new ComparisonOp($e1.node, $e2.node, Comparison.NOT_EQUAL).optimize(context);}
                         | ('!' | 'NOT') e=expr
-                          {$node = new Not($e.node).optimize();}
+                          {$node = new Not($e.node).optimize(context);}
                         | e1=expr ('AND' | '&&') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.AND).optimize();}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.AND).optimize(context);}
                         | e1=expr ('OR' | '||') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.OR).optimize();}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.OR).optimize(context);}
                         | e1=expr ('XOR' | '^^') e2=expr
-                          {$node = new LogicOp($e1.node, $e2.node, Logic.XOR).optimize();}
+                          {$node = new LogicOp($e1.node, $e2.node, Logic.XOR).optimize(context);}
                         | <assoc=right> e1=expr '?' e2=expr ':' e3=expr
-                          {$node = new Ternary($e1.node, $e2.node, $e3.node).optimize();}
+                          {$node = new Ternary($e1.node, $e2.node, $e3.node).optimize(context);}
 ;
 
 whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
-                                  {$node = new CaseWhen($when.node, $then.node);}
+                                  {$node = new CaseWhen($when.node, $then.node).optimize(context);}
 ;
 
 primary returns [Node node]: '(' e=expr ')'
                              {$node = $e.node;}
                            | 'TYPEOF' '(' e=expr ')'
-                             {$node = new TypeOf($e.node).optimize();}
+                             {$node = new TypeOf($e.node).optimize(context);}
                            | 'EVAL' '(' e=expr ')'
-                             {$node = new Eval($e.node).optimize();}
+                             {$node = new Eval($e.node).optimize(context);}
                            | 'PARALLEL' '(' '{' el=exprlist '}' { Node reducer = null; } ( ',' r=lambdaexpr { reducer = $r.node; } )? ')'
                              { $node = new Parallel(new ArrayDef($el.list), reducer); }
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=lambda
                              {$node = $l.lambdadef;}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' el=exprlist '}'
-                             {$node = new ArrayDef($el.list).optimize();}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' mapped=mappedexprlist '}'
-                             {$node = new MappedDef($mapped.map).optimize();}
+                             {$node = new ArrayDef($el.list).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? '{' mapped=mappedexprlist '}'
+                             {$node = new MappedDef($mapped.map).optimize(context);}
                            | IntegerConstant
-                             {$node = new LiteralValue(Long.parseLong($IntegerConstant.text)).optimize();}
+                             {$node = new LiteralValue(Long.parseLong($IntegerConstant.text)).optimize(context);}
                            | DecimalFloatingConstant
-                             {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)).optimize();}
+                             {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)).optimize(context);}
                            | StringLiteral
-                             {String string = $StringLiteral.text; $node = new LiteralValue(string == null ? "" : string.substring(1, string.length() - 1)).optimize();}
+                             {String string = $StringLiteral.text; $node = new LiteralValue(string == null ? "" : string.substring(1, string.length() - 1)).optimize(context);}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref
                              {$node = $col.fieldref;}
                            | Identifier
-                             {$node = new VariableRef($Identifier.text).optimize();}
+                             {$node = new VariableRef($Identifier.text).optimize(context);}
                            | 'this'
-                             {$node = new ThisRef().optimize();}
+                             {$node = new ThisRef().optimize(context);}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? lib=Identifier ':' entry=Identifier
-                             {$node = new LibraryRef($lib.text, $entry.text).optimize();}
+                             {$node = new LibraryRef($lib.text, $entry.text).optimize(context);}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_PROPERTY_REFERENCE)}? '$' Identifier
-                             {$node = new PropertyRef($Identifier.text).optimize();}
+                             {$node = new PropertyRef($Identifier.text).optimize(context);}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FUNCTION)}? ':' Identifier '(' el=exprlist ')'
-                             {$node = new FunctionCall($Identifier.text, $el.list).optimize();}
+                             {$node = new FunctionCall($Identifier.text, $el.list).optimize(context);}
                            | 'true'
                              {$node = LiteralValue.TRUE;}
                            | 'false'
@@ -112,7 +117,7 @@ primary returns [Node node]: '(' e=expr ')'
                            | 'CASE' {Node test = null; Node otherwise = null;} (case_=expr {test = $case_.node;})?
                              {List<CaseWhen> cases = new ArrayList<>();} (when=whenspec {cases.add($when.node);})*
                              ('ELSE' else_=expr {otherwise = $else_.node; } )? 'END'
-                             {$node = new Case(test, cases, otherwise).optimize();}
+                             {$node = new Case(test, cases, otherwise).optimize(context);}
 ;
 
 columnref returns [FieldRef fieldref]: '@' Identifier

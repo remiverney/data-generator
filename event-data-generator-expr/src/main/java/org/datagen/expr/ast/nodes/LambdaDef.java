@@ -9,11 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.AstWalker;
-import org.datagen.expr.ast.ExpressionFormatContext;
 import org.datagen.expr.ast.Lambda;
-import org.datagen.expr.ast.ValueFormatContext;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
+import org.datagen.expr.ast.format.ExpressionFormatContext;
+import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
