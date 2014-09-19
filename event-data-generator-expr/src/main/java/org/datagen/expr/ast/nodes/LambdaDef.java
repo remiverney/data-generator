@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.datagen.expr.ast.AstWalker;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.derivative.DerivationContextimpl;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.format.ValueFormatContext;
@@ -119,15 +120,11 @@ public class LambdaDef implements Value, Lambda {
 	private Map<String, Value> defineClosure(EvalContext context) {
 		List<String> references = new ArrayList<>();
 
-		// System.out.println("define closure:");
-
 		Visitor<VariableRef> visitor = new Visitor<VariableRef>() {
 			@Override
 			public VariableRef visit(VariableRef visited) {
 				if (!parameters.contains(visited.getReference())) {
 					references.add(visited.getReference());
-					// System.out.println("   add ref " +
-					// visited.getReference());
 				}
 				return visited;
 			}
@@ -141,14 +138,7 @@ public class LambdaDef implements Value, Lambda {
 				.collect(
 						Collectors.toMap(Function.<String> identity(),
 								x -> context.getVariable(x)));
-		// System.out.println("resolved closure:");
-		// for (Map.Entry<String, Value> entry : closure.entrySet()) {
-		// System.out.println("   "
-		// + entry.getKey()
-		// + "="
-		// + entry.getValue().toValueString(
-		// new DefaultValueFormatContext()));
-		// }
+
 		return closure;
 	}
 
@@ -166,5 +156,17 @@ public class LambdaDef implements Value, Lambda {
 		builder.append(')');
 
 		return builder;
+	}
+
+	@Override
+	public LambdaDef optimize(EvalContext context) {
+		return this;
+	}
+
+	@Override
+	public LambdaDef getDerivative(String variable) {
+		Node derivative = body.derivative(new DerivationContextimpl(variable));
+
+		return new LambdaDef(parameters, derivative);
 	}
 }

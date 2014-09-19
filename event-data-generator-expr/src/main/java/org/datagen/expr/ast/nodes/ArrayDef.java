@@ -117,4 +117,9 @@ public class ArrayDef implements Value, Array {
 
 		return builder;
 	}
+
+	@Override
+	public ArrayDef optimize(EvalContext context) {
+		return this;
+	}
 }

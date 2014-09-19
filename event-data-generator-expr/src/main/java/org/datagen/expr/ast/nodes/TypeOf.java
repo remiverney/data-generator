@@ -28,14 +28,22 @@ public class TypeOf implements Node {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		context.formatKeyword(builder, Keywords.TYPEOF);
 		builder.append('(');
 		expr.toString(builder, context);
 		builder.append(')');
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if (expr instanceof Value) {
+			return new LiteralValue(((Value) expr).getType().getTypeName());
+		}
+
+		return Node.super.optimize(context);
 	}
 
 }

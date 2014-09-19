@@ -2,8 +2,10 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.Date;
 
+import org.datagen.expr.ast.derivative.DerivationContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.format.ValueFormatContext;
+import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
 
@@ -11,6 +13,9 @@ public class LiteralValue implements Value {
 
 	public static final LiteralValue TRUE = new LiteralValue(true);
 	public static final LiteralValue FALSE = new LiteralValue(false);
+
+	public static final LiteralValue ZERO = new LiteralValue(0);
+	public static final LiteralValue ONE = new LiteralValue(1);
 
 	private final ValueType type;
 
@@ -40,8 +45,7 @@ public class LiteralValue implements Value {
 		this(ValueType.BOOLEAN, 0, 0.0, null, null, bool);
 	}
 
-	private LiteralValue(ValueType type, long integer, double real,
-			String string, Date date, boolean bool) {
+	private LiteralValue(ValueType type, long integer, double real, String string, Date date, boolean bool) {
 		this.type = type;
 		this.integer = integer;
 		this.real = real;
@@ -56,22 +60,27 @@ public class LiteralValue implements Value {
 	}
 
 	public long getInteger() {
+		assert type == ValueType.INTEGER;
 		return integer;
 	}
 
 	public double getReal() {
+		assert type == ValueType.REAL;
 		return real;
 	}
 
 	public String getString() {
+		assert type == ValueType.STRING;
 		return string;
 	}
 
 	public Date getDate() {
+		assert type == ValueType.DATE_TIME;
 		return date;
 	}
 
 	public boolean getBool() {
+		assert type == ValueType.BOOLEAN;
 		return bool;
 	}
 
@@ -116,8 +125,7 @@ public class LiteralValue implements Value {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		switch (type) {
 		case BOOLEAN:
 			return builder.append(bool);
@@ -128,7 +136,7 @@ public class LiteralValue implements Value {
 		case REAL:
 			return builder.append(real);
 		case STRING:
-			return builder.append('"').append(string).append('"');
+			return builder.append('"').append(string.replace("\"", "\\\"")).append('"');
 		default:
 			return builder;
 		}
@@ -157,8 +165,7 @@ public class LiteralValue implements Value {
 		case STRING:
 			return string.hashCode();
 		default:
-			throw new IllegalArgumentException(
-					"Unexpected literal value type [ " + type + " ]");
+			throw new IllegalArgumentException("Unexpected literal value type [ " + type + " ]");
 		}
 	}
 
@@ -194,8 +201,12 @@ public class LiteralValue implements Value {
 		case STRING:
 			return string.equals(other.getString());
 		default:
-			throw new IllegalArgumentException(
-					"Unexpected literal value type [ " + type + " ]");
+			throw new IllegalArgumentException("Unexpected literal value type [ " + type + " ]");
 		}
+	}
+
+	@Override
+	public Node derivative(DerivationContext context) {
+		return ZERO;
 	}
 }

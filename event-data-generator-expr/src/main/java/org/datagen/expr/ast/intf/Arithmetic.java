@@ -1,26 +1,29 @@
 package org.datagen.expr.ast.intf;
 
 import org.datagen.expr.ast.ValueOperation;
+import org.datagen.expr.ast.derivative.DerivationOperation;
 
 public enum Arithmetic implements Operator<Arithmetic> {
-	ADD(ValueOperation::add, "+", Precedence.ADD),
-	SUB(ValueOperation::sub, "-", Precedence.ADD),
-	MUL(ValueOperation::mul, "*", Precedence.MUL),
-	DIV(ValueOperation::div, "/", Precedence.MUL),
-	MOD(ValueOperation::mod, "%", Precedence.MUL),
-	NEG(null, "-", Precedence.NEG),
-	POW(ValueOperation::pow, "^", Precedence.POW),
-	FACT(null, "!", Precedence.FACT);
+	ADD("+", Precedence.ADD, ValueOperation::add, DerivationOperation::add),
+	SUB("-", Precedence.ADD, ValueOperation::sub, DerivationOperation::sub),
+	MUL("*", Precedence.MUL, ValueOperation::mul, DerivationOperation::mul),
+	DIV("/", Precedence.MUL, ValueOperation::div, DerivationOperation::div),
+	MOD("%", Precedence.MUL, ValueOperation::mod, DerivationOperation::nonDerivable),
+	NEG("-", Precedence.NEG, null, DerivationOperation::neg),
+	POW("^", Precedence.POW, ValueOperation::pow, DerivationOperation::pow),
+	FACT("!", Precedence.FACT, null, DerivationOperation::nonDerivable);
 
-	private final Operator.Evaluator evaluator;
 	private final String symbol;
 	private final Precedence precedence;
+	private final Operator.Evaluator evaluator;
+	private final DerivationOperation.Evaluator derivation;
 
-	private Arithmetic(Operator.Evaluator evaluator, String symbol,
-			Precedence precedence) {
+	private Arithmetic(String symbol, Precedence precedence, Operator.Evaluator evaluator,
+			DerivationOperation.Evaluator derivation) {
 		this.evaluator = evaluator;
 		this.symbol = symbol;
 		this.precedence = precedence;
+		this.derivation = derivation;
 	}
 
 	@Override
@@ -36,5 +39,9 @@ public enum Arithmetic implements Operator<Arithmetic> {
 	@Override
 	public Precedence getPrecedence() {
 		return precedence;
+	}
+
+	public DerivationOperation.Evaluator getDerivation() {
+		return derivation;
 	}
 }

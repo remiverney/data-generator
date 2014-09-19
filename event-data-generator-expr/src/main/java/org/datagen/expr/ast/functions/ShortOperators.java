@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.datagen.expr.ast.intf.Arithmetic;
+import org.datagen.expr.ast.intf.Logic;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.nodes.BinaryOp;
@@ -31,6 +32,9 @@ public final class ShortOperators {
 	public static final LambdaDef DIV = buildLambda(Arithmetic.DIV);
 	public static final LambdaDef MOD = buildLambda(Arithmetic.MOD);
 
+	public static final LambdaDef AND = buildLambda(Logic.AND);
+	public static final LambdaDef OR = buildLambda(Logic.OR);
+
 	private static final Map<String, LambdaDef> SHORT_OPERATOR_MAP = new HashMap<>();
 
 	static {
@@ -39,6 +43,8 @@ public final class ShortOperators {
 		SHORT_OPERATOR_MAP.put("*", MUL);
 		SHORT_OPERATOR_MAP.put("/", DIV);
 		SHORT_OPERATOR_MAP.put("%", MOD);
+		SHORT_OPERATOR_MAP.put("&&", AND);
+		SHORT_OPERATOR_MAP.put("||", OR);
 	}
 
 	private ShortOperators() {

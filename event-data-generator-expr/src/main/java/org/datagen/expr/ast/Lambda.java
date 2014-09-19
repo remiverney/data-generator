@@ -12,6 +12,8 @@ public interface Lambda {
 
 	Node getBody();
 
+	Node getDerivative(String variable);
+
 	Value eval(EvalContext context, Value... parameters);
 
 	Value eval(EvalContext context, Collection<Value> parameters);

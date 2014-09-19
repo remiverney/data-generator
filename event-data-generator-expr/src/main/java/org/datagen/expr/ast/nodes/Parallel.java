@@ -93,4 +93,15 @@ public class Parallel implements Node {
 
 		return builder;
 	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if ((reducer == null)
+				&& ((expr.getSize() == 1) || expr.getItems().stream()
+						.allMatch(x -> x instanceof LiteralValue))) {
+			return new ArrayDef(expr.getItems());
+		} else {
+			return this;
+		}
+	}
 }

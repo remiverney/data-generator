@@ -30,20 +30,20 @@ start returns [Node node]: e=expr EOF
 
 expr returns [Node node]: p=primary
                           {$node = $p.node;}
-                        | e=expr '!'
+                        | e=expr '.' Identifier
+                          {$node = new AttrRef($e.node, $Identifier.text).optimize(context);}
+                        | l=expr '(' el=lambdaexprlist ')'
+                          {$node = new LambdaCall($l.node, $el.list).optimize(context);}
+                        | a=expr '[' i=expr ']'
+                          {$node = new ArrayRef($a.node, $i.node).optimize(context);}
+                        | a=expr '[' i=expr '..' i2=expr ']'
+                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node).optimize(context);}
+                         | e=expr '!'
                           {$node = new Factorial($e.node).optimize(context);}
                         | '+' e=expr
                           {$node = $e.node;}
                         | '-' e=expr
                           {$node = new Negation($e.node).optimize(context);}
-                        | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=primary '(' el=lambdaexprlist? ')'
-                          {$node = new LambdaCall($l.node, $el.list).optimize(context);}
-                        | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY) || configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? a=primary '[' i=expr ']'
-                          {$node = new ArrayRef($a.node, $i.node).optimize(context);}
-                        | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? a=primary '[' i=expr '..' i2=expr ']'
-                          {$node = new ArrayRangeRef($a.node, $i.node, $i2.node).optimize(context);}
-                        | e=expr '.' Identifier
-                          {$node = new AttrRef($e.node, $Identifier.text).optimize(context);}
                         | e1=expr '^' e2=expr
                           {$node = new ArithmeticOp($e1.node, $e2.node, Arithmetic.POW).optimize(context);}
                         | e1=expr { Arithmetic op = null; } ('*' {op = Arithmetic.MUL;} | '/' {op = Arithmetic.DIV;} | '%' {op = Arithmetic.MOD;}) e2=expr
@@ -80,45 +80,45 @@ whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
 
 primary returns [Node node]: '(' e=expr ')'
                              {$node = $e.node;}
-                           | 'TYPEOF' '(' e=expr ')'
-                             {$node = new TypeOf($e.node).optimize(context);}
-                           | 'EVAL' '(' e=expr ')'
-                             {$node = new Eval($e.node).optimize(context);}
-                           | 'PARALLEL' '(' '{' el=exprlist '}' { Node reducer = null; } ( ',' r=lambdaexpr { reducer = $r.node; } )? ')'
-                             { $node = new Parallel(new ArrayDef($el.list), reducer); }
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? l=lambda
-                             {$node = $l.lambdadef;}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' el=exprlist '}'
-                             {$node = new ArrayDef($el.list).optimize(context);}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? '{' mapped=mappedexprlist '}'
-                             {$node = new MappedDef($mapped.map).optimize(context);}
                            | IntegerConstant
                              {$node = new LiteralValue(Long.parseLong($IntegerConstant.text)).optimize(context);}
                            | DecimalFloatingConstant
                              {$node = new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)).optimize(context);}
                            | StringLiteral
                              {String string = $StringLiteral.text; $node = new LiteralValue(string == null ? "" : string.substring(1, string.length() - 1)).optimize(context);}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref
-                             {$node = $col.fieldref;}
                            | Identifier
                              {$node = new VariableRef($Identifier.text).optimize(context);}
                            | 'this'
                              {$node = new ThisRef().optimize(context);}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? lib=Identifier ':' entry=Identifier
-                             {$node = new LibraryRef($lib.text, $entry.text).optimize(context);}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_PROPERTY_REFERENCE)}? '$' Identifier
-                             {$node = new PropertyRef($Identifier.text).optimize(context);}
-                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FUNCTION)}? ':' Identifier '(' el=exprlist ')'
-                             {$node = new FunctionCall($Identifier.text, $el.list).optimize(context);}
                            | 'true'
                              {$node = LiteralValue.TRUE;}
                            | 'false'
                              {$node = LiteralValue.FALSE;}
+                           | 'TYPEOF' '(' e=expr ')'
+                             {$node = new TypeOf($e.node).optimize(context);}
+                           | 'EVAL' '(' e=expr ')'
+                             {$node = new Eval($e.node).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_PROPERTY_REFERENCE)}? '$' Identifier
+                             {$node = new PropertyRef($Identifier.text).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref
+                             {$node = $col.fieldref;}
+                           | 'PARALLEL' '(' '{' el=exprlist '}' { Node reducer = null; } ( ',' r=lambdaexpr { reducer = $r.node; } )? ')'
+                             { $node = new Parallel(new ArrayDef($el.list).optimize(context), reducer).optimize(context); }
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LAMBDA_DEFINITION)}? lm=lambda
+                             {$node = $lm.lambdadef;}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_ARRAY)}? '{' el=exprlist '}'
+                             {$node = new ArrayDef($el.list).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? '{' mapped=mappedexprlist '}'
+                             {$node = new MappedDef($mapped.map).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? lib=Identifier ':' entry=Identifier
+                             {$node = new LibraryRef($lib.text, $entry.text).optimize(context);}
+                           | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FUNCTION)}? ':' Identifier '(' el=exprlist ')'
+                             {$node = new FunctionCall($Identifier.text, $el.list).optimize(context);}
                            | 'CASE' {Node test = null; Node otherwise = null;} (case_=expr {test = $case_.node;})?
                              {List<CaseWhen> cases = new ArrayList<>();} (when=whenspec {cases.add($when.node);})*
                              ('ELSE' else_=expr {otherwise = $else_.node; } )? 'END'
                              {$node = new Case(test, cases, otherwise).optimize(context);}
-;
+;  
 
 columnref returns [FieldRef fieldref]: '@' Identifier
                                        {$fieldref = new FieldRef($Identifier.text);}
@@ -129,7 +129,7 @@ lambda returns [LambdaDef lambdadef]: '('
         Identifier
           {parameters.add($Identifier.text);}
         (',' Identifier {parameters.add($Identifier.text);} )* '->' e=expr ')'
-          {$lambdadef = new LambdaDef(parameters, $e.node);}
+          {$lambdadef = new LambdaDef(parameters, $e.node).optimize(context);}
 ;
 
 exprlist returns [List<Node> list]: {$list = new ArrayList<Node>();}
@@ -156,4 +156,8 @@ lambdaexpr returns [Node node]: e=expr
                                 { $node = ShortOperators.getShortOperator("/"); }
                               | '%'
                                 { $node = ShortOperators.getShortOperator("%"); }
+                              | '&&'
+                                { $node = ShortOperators.getShortOperator("&&"); }
+                              | '||'
+                                { $node = ShortOperators.getShortOperator("||"); }
 ;

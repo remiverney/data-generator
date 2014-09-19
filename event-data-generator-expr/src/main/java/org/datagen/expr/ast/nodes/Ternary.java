@@ -8,6 +8,7 @@ import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.expr.ast.intf.ValueType;
 
 public class Ternary implements Node {
 
@@ -46,14 +47,12 @@ public class Ternary implements Node {
 
 	@Override
 	public Value eval(EvalContext context) {
-		return ValueOperation.evalBoolean(context, this,
-				condition.eval(context)) ? then.eval(context) : otherwise
+		return ValueOperation.evalBoolean(context, this, condition.eval(context)) ? then.eval(context) : otherwise
 				.eval(context);
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		condition.toString(builder, context);
 		context.spacing(builder);
 		builder.append('?');
@@ -65,6 +64,17 @@ public class Ternary implements Node {
 		otherwise.toString(builder, context);
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if (condition instanceof LiteralValue) {
+			if (((LiteralValue) condition).getType() == ValueType.BOOLEAN) {
+				return ((LiteralValue) condition).getBool() ? then : otherwise;
+			}
+		}
+
+		return Node.super.optimize(context);
 	}
 
 }

@@ -8,8 +8,7 @@ import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
 
-public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends
-		UnaryOp<O> {
+public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends UnaryOp<O> {
 
 	protected final Node lhs;
 
@@ -32,16 +31,13 @@ public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends
 
 	@Override
 	public Value eval(EvalContext context) {
-		return operator.getEvaluator().eval(context, this, lhs.eval(context),
-				rhs.eval(context));
+		return operator.getEvaluator().eval(context, this, lhs.eval(context), rhs.eval(context));
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		if ((lhs instanceof BinaryOp)
-				&& ((BinaryOp<?>) lhs).getOperator().getPrecedence()
-						.less(super.getOperator().getPrecedence())) {
+				&& ((BinaryOp<?>) lhs).getOperator().getPrecedence().less(super.getOperator().getPrecedence())) {
 			builder.append('(');
 			lhs.toString(builder, context);
 			builder.append(')');
@@ -54,8 +50,7 @@ public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends
 		context.spacing(builder);
 
 		if ((rhs instanceof BinaryOp)
-				&& !((BinaryOp<?>) rhs).getOperator().getPrecedence()
-						.higher(super.getOperator().getPrecedence())) {
+				&& !((BinaryOp<?>) rhs).getOperator().getPrecedence().higher(super.getOperator().getPrecedence())) {
 			builder.append('(');
 			rhs.toString(builder, context);
 			builder.append(')');
@@ -71,7 +66,7 @@ public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends
 		if ((rhs instanceof LiteralValue) && (lhs instanceof LiteralValue)) {
 			return eval(context);
 		} else {
-			return super.optimize(context);
+			return this;
 		}
 	}
 }

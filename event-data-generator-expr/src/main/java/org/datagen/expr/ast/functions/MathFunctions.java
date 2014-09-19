@@ -49,6 +49,7 @@ public final class MathFunctions {
 	public static final Function<Double, Double> cbrt = Math::cbrt;
 	public static final Function<Double, Double> ceil = Math::ceil;
 
+	@Derivable(f = "sin")
 	public static final Function<Double, Double> cos = Math::cos;
 	public static final Function<Double, Double> cosh = Math::cosh;
 
@@ -93,4 +94,7 @@ public final class MathFunctions {
 			.isInfinite(x));
 	public static final Function<Double, Boolean> isFinite = (x -> Double
 			.isFinite(x));
+
+	public static final Function<Double, Double> identity = (x -> x);
+	public static final Function<Double, Double> nil = (x -> 0.0d);
 }

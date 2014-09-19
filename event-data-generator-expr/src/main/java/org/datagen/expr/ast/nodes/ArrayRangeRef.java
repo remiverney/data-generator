@@ -43,18 +43,13 @@ public class ArrayRangeRef implements Node {
 		}
 
 		return new ArrayDef(((Array) resolved)
-				.getRange(
-						ValueOperation.evalInteger(context, this,
-								start.eval(context)),
-						ValueOperation.evalInteger(context, this,
-								end.eval(context))).stream()
-				.map(x -> x.eval(context))
-				.collect(Collectors.toCollection(ArrayList::new)));
+				.getRange(ValueOperation.evalInteger(context, this, start.eval(context)),
+						ValueOperation.evalInteger(context, this, end.eval(context))).stream()
+				.map(x -> x.eval(context)).collect(Collectors.toCollection(ArrayList::new)));
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		array.toString(builder, context).append('[');
 		start.toString(builder, context);
 		context.spacing(builder);
@@ -64,5 +59,16 @@ public class ArrayRangeRef implements Node {
 		builder.append(']');
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if ((start instanceof LiteralValue) && (end instanceof LiteralValue) && (array instanceof Array)) {
+			return new ArrayDef(((Array) array).getRange(
+					ValueOperation.evalInteger(context, this, start.eval(context)),
+					ValueOperation.evalInteger(context, this, end.eval(context))));
+		} else {
+			return Node.super.optimize(context);
+		}
 	}
 }

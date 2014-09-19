@@ -3,6 +3,7 @@ package org.datagen.expr.ast.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
@@ -61,5 +62,14 @@ public abstract class UnaryOp<O extends Operator<O>> implements Node {
 		}
 
 		return builder;
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if (rhs instanceof LiteralValue) {
+			return eval(context);
+		} else {
+			return Node.super.optimize(context);
+		}
 	}
 }

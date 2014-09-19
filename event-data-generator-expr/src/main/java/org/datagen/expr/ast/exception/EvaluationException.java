@@ -6,41 +6,41 @@ public abstract class EvaluationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private final int line;
-	private final int col;
+	private final Node node;
 
-	protected EvaluationException(Node node, String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
+	protected EvaluationException(Node node, String message, Throwable cause, boolean enableSuppression,
+			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 
-		this.line = node.getSourceLine();
-		this.col = node.getSourceCol();
+		this.node = node;
 	}
 
 	protected EvaluationException(Node node, String message, Throwable cause) {
 		super(message, cause);
 
-		this.line = node.getSourceLine();
-		this.col = node.getSourceCol();
+		this.node = node;
 	}
 
 	protected EvaluationException(Node node, String message) {
 		super(message);
 
-		this.line = node.getSourceLine();
-		this.col = node.getSourceCol();
+		this.node = node;
 	}
 
 	public int getLine() {
-		return line;
+		return node.getSourceLine();
 	}
 
 	public int getCol() {
-		return col;
+		return node.getSourceCol();
+	}
+
+	public Node getNode() {
+		return node;
 	}
 
 	@Override
 	public String toString() {
-		return "[" + line + ":" + col + "]: " + super.toString();
+		return "[" + getLine() + ":" + getCol() + "]: " + super.toString();
 	}
 }
