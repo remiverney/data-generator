@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.context.ValidationContext;
+import org.datagen.expr.ast.context.ValidationResult.StatusLevel;
+import org.datagen.expr.ast.exception.IncompatibleTypesException;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -75,6 +78,17 @@ public class Ternary implements Node {
 		}
 
 		return Node.super.optimize(context);
+	}
+
+	@Override
+	public void validate(ValidationContext context) {
+		if (condition instanceof Value) {
+			if (((LiteralValue) condition).getType() != ValueType.BOOLEAN) {
+				context.addStatus(StatusLevel.ERROR, new IncompatibleTypesException(this, null, (Value) condition));
+			}
+		}
+
+		Node.super.validate(context);
 	}
 
 }

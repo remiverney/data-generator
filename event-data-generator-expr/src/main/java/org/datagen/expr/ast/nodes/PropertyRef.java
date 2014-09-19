@@ -31,8 +31,7 @@ public class PropertyRef implements Reference {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		return builder.append('$').append(property);
 	}
 

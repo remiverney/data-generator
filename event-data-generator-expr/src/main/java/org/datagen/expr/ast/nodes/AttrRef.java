@@ -72,16 +72,14 @@ public class AttrRef implements Node {
 			case LAST:
 				return array.get(array.getSize() - 1).eval(context);
 			default:
-				throw new IncompatibleAttributeException(this, value.getType(),
-						attribute.name());
+				throw new IncompatibleAttributeException(this, value.getType(), attribute.name());
 			}
 		case MAPPED:
 			switch (attribute) {
 			case LENGTH:
 				return new LiteralValue(((Mapped) value).getSize());
 			default:
-				throw new IncompatibleAttributeException(this, value.getType(),
-						attribute.name());
+				throw new IncompatibleAttributeException(this, value.getType(), attribute.name());
 			}
 		case DATE_TIME:
 			Calendar calendar = Calendar.getInstance();
@@ -111,28 +109,33 @@ public class AttrRef implements Node {
 			case TIME:
 				return new LiteralValue(calendar.getTimeInMillis());
 			default:
-				throw new IncompatibleAttributeException(this, value.getType(),
-						attribute.name());
+				throw new IncompatibleAttributeException(this, value.getType(), attribute.name());
 			}
 		case LAMBDA:
 			switch (attribute) {
 			case ARITY:
 				return new LiteralValue(((Lambda) value).getArity());
 			default:
-				throw new IncompatibleAttributeException(this, value.getType(),
-						attribute.name());
+				throw new IncompatibleAttributeException(this, value.getType(), attribute.name());
 			}
 		default:
-			throw new IncompatibleAttributeException(this, value.getType(),
-					attribute.name());
+			throw new IncompatibleAttributeException(this, value.getType(), attribute.name());
 		}
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		expr.toString(builder, context).append('.');
 
 		return builder.append(attribute.identifier());
+	}
+
+	@Override
+	public Node optimize(EvalContext context) {
+		if (expr instanceof Value) {
+			return eval(context);
+		} else {
+			return Node.super.optimize(context);
+		}
 	}
 }

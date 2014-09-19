@@ -2,6 +2,9 @@ package org.datagen.expr.ast.nodes;
 
 import org.datagen.expr.ast.ValueOperation;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.context.ValidationContext;
+import org.datagen.expr.ast.context.ValidationResult.StatusLevel;
+import org.datagen.expr.ast.exception.IncompatibleTypesException;
 import org.datagen.expr.ast.intf.Arithmetic;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
@@ -26,7 +29,18 @@ public class Factorial extends UnaryOp<Arithmetic> {
 			}
 		}
 
-		return super.optimize(context);
+		return this;
+	}
+
+	@Override
+	public void validate(ValidationContext context) {
+		if (rhs instanceof Value) {
+			if (((LiteralValue) rhs).getType() != ValueType.INTEGER) {
+				context.addStatus(StatusLevel.ERROR, new IncompatibleTypesException(this, Arithmetic.FACT, (Value) rhs));
+			}
+		} else {
+			super.validate(context);
+		}
 	}
 
 }

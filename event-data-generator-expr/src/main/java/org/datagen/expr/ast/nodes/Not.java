@@ -26,7 +26,7 @@ public class Not extends UnaryOp<Logic> {
 			}
 		}
 
-		return super.optimize(context);
+		return this;
 	}
 
 }

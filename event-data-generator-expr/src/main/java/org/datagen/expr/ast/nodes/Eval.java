@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.context.EvalContext;
+import org.datagen.expr.ast.context.ValidationContext;
+import org.datagen.expr.ast.context.ValidationResult.StatusLevel;
 import org.datagen.expr.ast.exception.DynamicEvaluationException;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.exception.ParsingException;
@@ -28,8 +30,7 @@ public class Eval implements Node {
 		Value value = expr.eval(context);
 
 		if (value.getType() != ValueType.STRING) {
-			throw new IncompatibleArgumentException(this, 1, value.getType(),
-					ValueType.STRING);
+			throw new IncompatibleArgumentException(this, 1, value.getType(), ValueType.STRING);
 		}
 
 		return eval(((LiteralValue) value).getString(), context);
@@ -41,8 +42,7 @@ public class Eval implements Node {
 
 	private Value eval(String string, EvalContext context) {
 		try {
-			ParserResult result = Parser.parse(string, context.getInterpreter()
-					.getConfiguration(), context);
+			ParserResult result = Parser.parse(string, context.getInterpreter().getConfiguration(), context);
 			return result.getRoot().eval(context);
 		} catch (ParsingException e) {
 			throw new DynamicEvaluationException(this, string, e);
@@ -55,8 +55,7 @@ public class Eval implements Node {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		context.formatKeyword(builder, Keywords.EVAL);
 
 		builder.append('(');
@@ -64,6 +63,17 @@ public class Eval implements Node {
 		builder.append(')');
 
 		return builder;
+	}
+
+	@Override
+	public void validate(ValidationContext context) {
+		if (expr instanceof Value) {
+			if (((Value) expr).getType() != ValueType.STRING) {
+				context.addStatus(StatusLevel.ERROR,
+						new IncompatibleArgumentException(this, 1, ((Value) expr).getType(), ValueType.STRING));
+			}
+		}
+		Node.super.validate(context);
 	}
 
 }
