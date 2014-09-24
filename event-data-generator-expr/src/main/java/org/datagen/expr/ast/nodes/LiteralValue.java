@@ -209,4 +209,25 @@ public class LiteralValue implements Value {
 	public Node derivative(DerivationContext context) {
 		return ZERO;
 	}
+	//
+	// public static LiteralValue from(Node node, String reference, Object
+	// value) {
+	// if (value == null) {
+	// throw new IncompatibleFunctionReturnTypeException(node, reference);
+	// }
+	//
+	// MethodType type = MethodType.methodType(Void.class, value.getClass());
+	// try {
+	// return (LiteralValue)
+	// MethodHandles.publicLookup().findConstructor(LiteralValue.class,
+	// type).invoke(value);
+	// } catch (NoSuchMethodException | IllegalAccessException e) {
+	// throw new IncompatibleFunctionReturnTypeException(node, reference,
+	// value.getClass());
+	// } catch (Throwable e) {
+	// throw new RuntimeException(MessageFormat.format(
+	// "Unexpected exception when building literal value from object of class [ {0} ]",
+	// value.getClass()));
+	// }
+	// }
 }

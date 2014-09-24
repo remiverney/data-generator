@@ -19,14 +19,13 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 	ALLOW_FIELD_REFERENCE(boolean.class, true),
 
 	ENABLE_PARALLEL(boolean.class, true),
-	ENABLE_AGGRESSIVE_OPTIMIZATIONS(boolean.class, false),
+	ENABLE_OPTIMIZATIONS(boolean.class, true),
 	OPTIMIZER_FORMATTER(ValueFormatContext.class, null);
 
 	private final Class<? extends Serializable> type;
 	private final Serializable defaultValue;
 
-	private <T extends Serializable> InterpreterParameters(Class<T> type,
-			T defaultValue) {
+	private <T extends Serializable> InterpreterParameters(Class<T> type, T defaultValue) {
 		this.type = type;
 		this.defaultValue = defaultValue;
 	}

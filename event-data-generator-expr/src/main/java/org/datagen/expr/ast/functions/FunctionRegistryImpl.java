@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.CastMatrix;
 import org.datagen.expr.ast.exception.BadArgumentsNumberException;
+import org.datagen.expr.ast.exception.FunctionInvocationException;
 import org.datagen.expr.ast.exception.IncompatibleArgumentException;
 import org.datagen.expr.ast.exception.UnresolvedReferenceException;
 import org.datagen.expr.ast.intf.Node;
@@ -56,8 +57,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 
 		private final EmptyFunction<R> function;
 
-		private EmptyFunctionCallBridge(boolean deterministic,
-				EmptyFunction<R> function) {
+		private EmptyFunctionCallBridge(boolean deterministic, EmptyFunction<R> function) {
 			super(deterministic);
 			this.function = function;
 		}
@@ -65,8 +65,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		@Override
 		public Value bridge(Node node, List<Value> parameters) {
 			if (!parameters.isEmpty()) {
-				throw new BadArgumentsNumberException(node, parameters.size(),
-						0);
+				throw new BadArgumentsNumberException(node, parameters.size(), 0);
 			}
 
 			return toValue(function.apply());
@@ -78,8 +77,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		private final Function<T, R> function;
 		private final Class<T> clazz1;
 
-		private FunctionCallBridge(boolean deterministic,
-				Function<T, R> function, Class<T> clazz1) {
+		private FunctionCallBridge(boolean deterministic, Function<T, R> function, Class<T> clazz1) {
 			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
@@ -88,12 +86,10 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		@Override
 		public Value bridge(Node node, List<Value> parameters) {
 			if (!(parameters.size() == 1)) {
-				throw new BadArgumentsNumberException(node, parameters.size(),
-						1);
+				throw new BadArgumentsNumberException(node, parameters.size(), 1);
 			}
 
-			return toValue(function.apply(fromValue(node, 1, parameters.get(0),
-					clazz1)));
+			return toValue(function.apply(fromValue(node, 1, parameters.get(0), clazz1)));
 		}
 	}
 
@@ -103,8 +99,8 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		private final Class<T> clazz1;
 		private final Class<U> clazz2;
 
-		private BiFunctionCallBridge(boolean deterministic,
-				BiFunction<T, U, R> function, Class<T> clazz1, Class<U> clazz2) {
+		private BiFunctionCallBridge(boolean deterministic, BiFunction<T, U, R> function, Class<T> clazz1,
+				Class<U> clazz2) {
 			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
@@ -114,26 +110,22 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		@Override
 		public Value bridge(Node node, List<Value> parameters) {
 			if (!(parameters.size() == 2)) {
-				throw new BadArgumentsNumberException(node, parameters.size(),
-						2);
+				throw new BadArgumentsNumberException(node, parameters.size(), 2);
 			}
 
-			return toValue(function.apply(
-					fromValue(node, 1, parameters.get(0), clazz1),
+			return toValue(function.apply(fromValue(node, 1, parameters.get(0), clazz1),
 					fromValue(node, 2, parameters.get(1), clazz2)));
 		}
 	}
 
-	public static class TriFunctionCallBridge<T, U, V, R> extends
-			BaseCallBridge {
+	public static class TriFunctionCallBridge<T, U, V, R> extends BaseCallBridge {
 
 		private final TriFunction<T, U, V, R> function;
 		private final Class<T> clazz1;
 		private final Class<U> clazz2;
 		private final Class<V> clazz3;
 
-		private TriFunctionCallBridge(boolean deterministic,
-				TriFunction<T, U, V, R> function, Class<T> clazz1,
+		private TriFunctionCallBridge(boolean deterministic, TriFunction<T, U, V, R> function, Class<T> clazz1,
 				Class<U> clazz2, Class<V> clazz3) {
 			super(deterministic);
 			this.function = function;
@@ -145,14 +137,11 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		@Override
 		public Value bridge(Node node, List<Value> parameters) {
 			if (!(parameters.size() == 3)) {
-				throw new BadArgumentsNumberException(node, parameters.size(),
-						3);
+				throw new BadArgumentsNumberException(node, parameters.size(), 3);
 			}
 
-			return toValue(function.apply(
-					fromValue(node, 1, parameters.get(0), clazz1),
-					fromValue(node, 2, parameters.get(1), clazz2),
-					fromValue(node, 3, parameters.get(2), clazz3)));
+			return toValue(function.apply(fromValue(node, 1, parameters.get(0), clazz1),
+					fromValue(node, 2, parameters.get(1), clazz2), fromValue(node, 3, parameters.get(2), clazz3)));
 		}
 	}
 
@@ -161,8 +150,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		private final VarArgFunction<T, R> function;
 		private final Class<T> clazz1;
 
-		private VarArgFunctionCallBridge(boolean deterministic,
-				VarArgFunction<T, R> function, Class<T> clazz1) {
+		private VarArgFunctionCallBridge(boolean deterministic, VarArgFunction<T, R> function, Class<T> clazz1) {
 			super(deterministic);
 			this.function = function;
 			this.clazz1 = clazz1;
@@ -184,8 +172,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	private final Class<?> FUNCTION_CLASSES[] = new Class<?>[] {
-			MathFunctions.class, StringFunctions.class };
+	private final Class<?> FUNCTION_CLASSES[] = new Class<?>[] { MathFunctions.class, StringFunctions.class };
 
 	private final Map<String, CallBridge> functions = new HashMap<>();
 
@@ -217,7 +204,11 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 			throw new UnresolvedReferenceException(node, name);
 		}
 
-		return bridge.bridge(node, parameters);
+		try {
+			return bridge.bridge(node, parameters);
+		} catch (Throwable t) {
+			throw new FunctionInvocationException(node, name, t);
+		}
 	}
 
 	private void registerAll() {
@@ -231,64 +222,52 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 
 		for (Field field : fields) {
 			if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
-					&& java.lang.reflect.Modifier
-							.isPublic(field.getModifiers())
+					&& java.lang.reflect.Modifier.isPublic(field.getModifiers())
 					&& java.lang.reflect.Modifier.isFinal(field.getModifiers())) {
 				try {
 					functions.put(field.getName(), buildBridge(field));
 				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RuntimeException(
-							"Failed to register function field '"
-									+ field.getName() + "' of class '"
-									+ clazz.getName() + "', skipping", e);
+					throw new RuntimeException("Failed to register function field '" + field.getName() + "' of class '"
+							+ clazz.getName() + "', skipping", e);
 				}
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private CallBridge buildBridge(Field field)
-			throws IllegalArgumentException, IllegalAccessException {
+	private CallBridge buildBridge(Field field) throws IllegalArgumentException, IllegalAccessException {
 		Type type = field.getGenericType();
 
 		if (!(type instanceof ParameterizedType)) {
-			throw new RuntimeException("Failed to register function field '"
-					+ field.getName() + "' of non parameterized type '"
-					+ type.getTypeName() + "', skipping");
+			throw new RuntimeException("Failed to register function field '" + field.getName()
+					+ "' of non parameterized type '" + type.getTypeName() + "', skipping");
 		}
 
 		ParameterizedType parameterized = (ParameterizedType) type;
-		boolean deterministic = !field.getDeclaringClass().isAnnotationPresent(
-				NonDeterministic.class)
+		boolean deterministic = !field.getDeclaringClass().isAnnotationPresent(NonDeterministic.class)
 				&& !field.isAnnotationPresent(NonDeterministic.class);
 
 		if (parameterized.getRawType() == EmptyFunction.class) {
-			return new EmptyFunctionCallBridge<>(deterministic,
-					(EmptyFunction<Object>) field.get(null));
+			return new EmptyFunctionCallBridge<>(deterministic, (EmptyFunction<Object>) field.get(null));
 		} else if (parameterized.getRawType() == Function.class) {
-			return new FunctionCallBridge<>(deterministic,
-					(Function<Object, Object>) field.get(null),
+			return new FunctionCallBridge<>(deterministic, (Function<Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0]);
 		} else if (parameterized.getRawType() == BiFunction.class) {
-			return new BiFunctionCallBridge<>(deterministic,
-					(BiFunction<Object, Object, Object>) field.get(null),
+			return new BiFunctionCallBridge<>(deterministic, (BiFunction<Object, Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0],
 					(Class<Object>) parameterized.getActualTypeArguments()[1]);
 		} else if (parameterized.getRawType() == TriFunction.class) {
 			return new TriFunctionCallBridge<>(deterministic,
-					(TriFunction<Object, Object, Object, Object>) field
-							.get(null),
+					(TriFunction<Object, Object, Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0],
 					(Class<Object>) parameterized.getActualTypeArguments()[1],
 					(Class<Object>) parameterized.getActualTypeArguments()[2]);
 		} else if (parameterized.getRawType() == VarArgFunction.class) {
-			return new VarArgFunctionCallBridge<>(deterministic,
-					(VarArgFunction<Object, Object>) field.get(null),
+			return new VarArgFunctionCallBridge<>(deterministic, (VarArgFunction<Object, Object>) field.get(null),
 					(Class<Object>) parameterized.getActualTypeArguments()[0]);
 		} else {
-			throw new RuntimeException("Failed to register function field '"
-					+ field.getName() + "' of non function type '"
-					+ type.getTypeName() + "', skipping");
+			throw new RuntimeException("Failed to register function field '" + field.getName()
+					+ "' of non function type '" + type.getTypeName() + "', skipping");
 		}
 	}
 
@@ -346,22 +325,18 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 
 		if (literal.getClass().isArray()) {
-			return new ArrayDef(Arrays.stream((Object[]) literal)
-					.map(x -> toValue(x))
+			return new ArrayDef(Arrays.stream((Object[]) literal).map(x -> toValue(x))
 					.collect(Collectors.toCollection(ArrayList::new)));
 		}
 
-		throw new IllegalArgumentException(
-				"Unexpected literal class to convert to a Value [ "
-						+ literal.getClass().getName() + " ]");
+		throw new IllegalArgumentException("Unexpected literal class to convert to a Value [ "
+				+ literal.getClass().getName() + " ]");
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T fromValue(Node node, int parameter, Value value,
-			Class<T> clazz) {
+	private static <T> T fromValue(Node node, int parameter, Value value, Class<T> clazz) {
 		if (!(value instanceof LiteralValue)) {
-			throw new IncompatibleArgumentException(node, parameter,
-					value.getType());
+			throw new IncompatibleArgumentException(node, parameter, value.getType());
 		}
 
 		LiteralValue literal = (LiteralValue) value;
@@ -370,8 +345,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		if (!clazz.isInstance(result)) {
 			result = CastMatrix.cast(result, clazz);
 			if (result == null) {
-				throw new IncompatibleArgumentException(node, parameter,
-						value.getType());
+				throw new IncompatibleArgumentException(node, parameter, value.getType());
 			}
 		}
 

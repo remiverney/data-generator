@@ -21,6 +21,15 @@ public class UnresolvedReferenceException extends EvaluationException {
 		this.reference = reference;
 	}
 
+	public UnresolvedReferenceException(Node node, String reference, Throwable cause) {
+		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, reference), reference, cause);
+	}
+
+	public UnresolvedReferenceException(Node node, String message, String reference, Throwable cause) {
+		super(node, message, cause);
+		this.reference = reference;
+	}
+
 	public String getReference() {
 		return reference;
 	}

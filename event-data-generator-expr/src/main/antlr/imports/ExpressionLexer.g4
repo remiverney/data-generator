@@ -35,7 +35,7 @@ StringLiteral : '"' SCharSequence? '"'
 fragment IdentifierNondigit : Nondigit
 ;
 
-fragment Nondigit : [a-zA-Z_]
+fragment Nondigit : [a-zA-Z$_]
 ;
 
 fragment Digit : [0-9]
@@ -99,3 +99,12 @@ fragment OctalEscapeSequence : '\\' OctalDigit
 fragment HexadecimalEscapeSequence : '\\x' HexadecimalDigit+
 ;
 
+fragment JavaLetter : [a-zA-Z$_]
+                    | ~[\u0000-\u00FF\uD800-\uDBFF] {Character.isJavaIdentifierStart(_input.LA(-1))}?
+                    | [\uD800-\uDBFF] [\uDC00-\uDFFF] {Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
+;
+
+fragment JavaLetterOrDigit : [a-zA-Z0-9$_]
+                           | ~[\u0000-\u00FF\uD800-\uDBFF] {Character.isJavaIdentifierPart(_input.LA(-1))}?
+                           | [\uD800-\uDBFF] [\uDC00-\uDFFF] {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
+;

@@ -92,7 +92,11 @@ public class ValidationContextImpl implements ValidationContext {
 
 	@Override
 	public Collection<Status> getStatuses(StatusLevel min, boolean sorted) {
-		Stream<Status> filtered = this.statuses.stream().filter(s -> (s.getLevel().compareTo(min) <= 0));
+		Stream<Status> filtered = this.statuses.stream();
+
+		if (min != null) {
+			filtered = filtered.filter(s -> (s.getLevel().compareTo(min) <= 0));
+		}
 
 		return (sorted ? filtered.sorted() : filtered).collect(Collectors.toCollection(ArrayList::new));
 	}
