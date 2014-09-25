@@ -13,6 +13,7 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 	ALLOW_ARITHMETIC(boolean.class, true),
 	ALLOW_FUNCTION(boolean.class, true),
 	ALLOW_LIBRARY_REFERENCE(boolean.class, true),
+	ALLOW_JAVA_REFERENCE(boolean.class, true),
 	ALLOW_ARRAY(boolean.class, true),
 	ALLOW_MAPPED(boolean.class, true),
 	ALLOW_PROPERTY_REFERENCE(boolean.class, true),
@@ -20,6 +21,7 @@ public enum InterpreterParameters implements BuilderParameter<Serializable> {
 
 	ENABLE_PARALLEL(boolean.class, true),
 	ENABLE_OPTIMIZATIONS(boolean.class, true),
+
 	OPTIMIZER_FORMATTER(ValueFormatContext.class, null);
 
 	private final Class<? extends Serializable> type;

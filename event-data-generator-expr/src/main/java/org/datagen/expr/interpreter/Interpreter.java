@@ -63,4 +63,8 @@ public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
 	void setSequence(long sequence);
 
 	void nextSequence();
+
+	void setJavaRefClassLoader(ClassLoader loader);
+
+	ClassLoader getJavaRefClassLoader();
 }

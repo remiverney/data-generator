@@ -81,6 +81,7 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 	private final ValueFormatContext formatContext;
 	private final EvalContext context;
 	private Config<InterpreterParameters> configuration;
+	private ClassLoader refClassLoader = null;
 
 	public InterpreterImpl() {
 		this(new ConfigBuilder<InterpreterParameters>().build());
@@ -255,21 +256,21 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 	}
 
 	private ValidationResult registerExpressionUnchecked(String column, String expression) throws ParsingException {
-		ParserResult result = Parser.parse(expression, configuration, context);
+		ParserResult result = Parser.parse(expression, configuration, context, refClassLoader);
 
 		return registerExpressionUnchecked(column, result);
 	}
 
 	private ValidationResult registerExpressionUnchecked(String column, InputStream stream) throws IOException,
 			ParsingException {
-		ParserResult result = Parser.parse(stream, configuration, context);
+		ParserResult result = Parser.parse(stream, configuration, context, refClassLoader);
 
 		return registerExpressionUnchecked(column, result);
 	}
 
 	private ValidationResult registerExpressionUnchecked(String column, Reader reader) throws IOException,
 			ParsingException {
-		ParserResult result = Parser.parse(reader, configuration, context);
+		ParserResult result = Parser.parse(reader, configuration, context, refClassLoader);
 
 		return registerExpressionUnchecked(column, result);
 	}
@@ -293,7 +294,7 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 		this.context.registerLibrary(name,
 				library.entrySet().stream().collect(Collectors.toMap(Map.Entry<String, String>::getKey, x -> {
 					try {
-						return Parser.parse(x.getValue(), configuration, context).getRoot();
+						return Parser.parse(x.getValue(), configuration, context, refClassLoader).getRoot();
 					} catch (ParsingException e) {
 						embedded.add(e);
 						return null;
@@ -334,6 +335,16 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 	@Override
 	public void unsetProperty(String property) {
 		context.unsetProperty(property);
+	}
+
+	@Override
+	public void setJavaRefClassLoader(ClassLoader loader) {
+		this.refClassLoader = loader;
+	}
+
+	@Override
+	public ClassLoader getJavaRefClassLoader() {
+		return this.refClassLoader;
 	}
 
 }

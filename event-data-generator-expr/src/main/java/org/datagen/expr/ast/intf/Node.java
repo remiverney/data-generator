@@ -29,15 +29,15 @@ public interface Node extends Composite<Node>, Visitable<Node> {
 		return 0;
 	}
 
-	default public Node optimize(EvalContext context) {
-		return this;
-	}
-
 	default public void validate(ValidationContext context) {
 	}
 
 	default public Node derivative(DerivationContext context) {
 		throw new NonDerivableExpressionException(this);
+	}
+
+	default Node optimize(EvalContext context) {
+		return this;
 	}
 
 	StringBuilder toString(StringBuilder builder, ExpressionFormatContext context);

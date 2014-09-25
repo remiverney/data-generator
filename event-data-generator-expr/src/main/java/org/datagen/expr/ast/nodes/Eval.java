@@ -20,9 +20,15 @@ import org.datagen.expr.parser.ParserResult;
 public class Eval implements Node {
 
 	private final Node expr;
+	private final ClassLoader loader;
 
 	public Eval(Node expr) {
+		this(expr, null);
+	}
+
+	public Eval(Node expr, ClassLoader loader) {
 		this.expr = expr;
+		this.loader = loader;
 	}
 
 	@Override
@@ -42,7 +48,8 @@ public class Eval implements Node {
 
 	private Value eval(String string, EvalContext context) {
 		try {
-			ParserResult result = Parser.parse(string, context.getInterpreter().getConfiguration(), context);
+			ParserResult result = Parser.parse(string, context.getInterpreter().getConfiguration(), context,
+					this.loader);
 			return result.getRoot().eval(context);
 		} catch (ParsingException e) {
 			throw new DynamicEvaluationException(this, string, e);

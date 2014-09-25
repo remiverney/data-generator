@@ -26,12 +26,22 @@ public class JavaRef implements Node {
 	private final String reference;
 	private final MethodHandle handle;
 	private final List<Node> parameters;
+	private final ClassLoader loader;
 
 	public JavaRef(List<String> fqn) {
-		this(fqn, null);
+		this(fqn, (ClassLoader) null);
+	}
+
+	public JavaRef(List<String> fqn, ClassLoader loader) {
+		this(fqn, null, null);
 	}
 
 	public JavaRef(List<String> fqn, List<Node> parameters) {
+		this(fqn, parameters, null);
+	}
+
+	public JavaRef(List<String> fqn, List<Node> parameters, ClassLoader loader) {
+		this.loader = loader;
 		this.methodName = fqn.remove(fqn.size() - 1);
 		this.clazz = findClass(fqn);
 		this.parameters = parameters;
@@ -40,10 +50,19 @@ public class JavaRef implements Node {
 	}
 
 	public JavaRef(String fqn) {
-		this(fqn, null);
+		this(fqn, (ClassLoader) null);
+	}
+
+	public JavaRef(String fqn, ClassLoader loader) {
+		this(fqn, null, loader);
 	}
 
 	public JavaRef(String fqn, List<Node> parameters) {
+		this(fqn, parameters, null);
+	}
+
+	public JavaRef(String fqn, List<Node> parameters, ClassLoader loader) {
+		this.loader = loader;
 		int pos = fqn.lastIndexOf('.');
 
 		if (pos <= 0) {
@@ -67,7 +86,7 @@ public class JavaRef implements Node {
 
 	private Class<?> findClass(String className) {
 		try {
-			return Class.forName(className);
+			return (this.loader == null) ? Class.forName(className) : Class.forName(className, true, this.loader);
 		} catch (ClassNotFoundException e) {
 			throw new UnresolvedReferenceException(this, className);
 		}

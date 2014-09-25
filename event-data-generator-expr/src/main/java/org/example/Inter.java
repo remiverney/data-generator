@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,18 +21,19 @@ import org.datagen.utils.Observer;
 
 public class Inter {
 
-	public static class C<T extends Serializable & Comparable<C<T>>> {
-		void f() {
-			try {
-
-			} catch (final NullPointerException | ArrayIndexOutOfBoundsException e) {
-
-			}
-		}
-	}
-
-	public Inter() {
-	}
+	// @FunctionalInterface
+	// private interface Optimizer<T extends Node> {
+	// // T optimize(Node node);
+	// T optimize(Node n, EvalContext ctx);
+	// }
+	//
+	// // private Optimizer<?> optimizer = (x -> x.optimize(null));
+	// private Optimizer<?> optimizer = Node::optimize;
+	//
+	// public Inter() {
+	// Node n = optimizer.optimize(new Not(null), null);
+	// CaseWhen when = optimizer.optimize(new CaseWhen(null, null), null);
+	// }
 
 	public static void main(String[] args) throws FileNotFoundException, CircularDependencyException,
 			UnresolvedDependencyException, IOException, ParsingException {
