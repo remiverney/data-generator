@@ -18,30 +18,23 @@ public class IncompatibleTypesException extends EvaluationException {
 	private final ValueType lhs;
 	private final ValueType rhs;
 
-	public IncompatibleTypesException(Node node, Operator<?> operator,
-			Value lhs, Value rhs) {
+	public IncompatibleTypesException(Node node, Operator<?> operator, Value lhs, Value rhs) {
 		this(node, operator, lhs.getType(), rhs.getType());
 	}
 
-	public IncompatibleTypesException(Node node, Operator<?> operator,
-			ValueType lhs, ValueType rhs) {
-		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN_2, lhs, rhs,
-				operator), operator, lhs, rhs);
+	public IncompatibleTypesException(Node node, Operator<?> operator, ValueType lhs, ValueType rhs) {
+		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN_2, lhs, rhs, operator.getSymbol()), operator, lhs, rhs);
 	}
 
 	public IncompatibleTypesException(Node node, Operator<?> operator, Value rhs) {
 		this(node, operator, rhs.getType());
 	}
 
-	public IncompatibleTypesException(Node node, Operator<?> operator,
-			ValueType rhs) {
-		this(node,
-				MessageFormat.format(EXCEPTION_MSG_PATTERN_1, rhs, operator),
-				operator, null, rhs);
+	public IncompatibleTypesException(Node node, Operator<?> operator, ValueType rhs) {
+		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN_1, rhs, operator.getSymbol()), operator, null, rhs);
 	}
 
-	public IncompatibleTypesException(Node node, String message,
-			Operator<?> operator, ValueType lhs, ValueType rhs) {
+	public IncompatibleTypesException(Node node, String message, Operator<?> operator, ValueType lhs, ValueType rhs) {
 		super(node, message);
 		this.operator = operator;
 		this.lhs = lhs;

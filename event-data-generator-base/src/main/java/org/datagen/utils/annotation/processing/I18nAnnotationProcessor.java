@@ -38,19 +38,16 @@ public class I18nAnnotationProcessor extends AbstractProcessor {
 	}
 
 	@Override
-	public boolean process(Set<? extends TypeElement> annotations,
-			RoundEnvironment roundEnv) {
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		Messager messager = processingEnv.getMessager();
 		Filer filer = processingEnv.getFiler();
 		Elements utils = processingEnv.getElementUtils();
 
 		messager.printMessage(MESSAGE_KIND, "Processing i18n catalogs...");
 
-		TypeElement catalogElement = utils
-				.getTypeElement(I18N_CATALOG_ANNOTATION_CLASSNAME);
+		TypeElement catalogElement = utils.getTypeElement(I18N_CATALOG_ANNOTATION_CLASSNAME);
 
-		Set<? extends Element> catalogs = roundEnv
-				.getElementsAnnotatedWith(catalogElement);
+		Set<? extends Element> catalogs = roundEnv.getElementsAnnotatedWith(catalogElement);
 
 		for (Element catalog : catalogs) {
 			if (!(catalog instanceof TypeElement)) {
@@ -61,43 +58,34 @@ public class I18nAnnotationProcessor extends AbstractProcessor {
 				createI18nProperties(filer, messager, (TypeElement) catalog);
 			} catch (IOException e) {
 				messager.printMessage(Kind.ERROR,
-						"Could not create i18n catalog file "
-								+ catalog.getAnnotation(I18nCatalog.class)
-										.catalog() + ": " + e, catalog);
+						"Could not create i18n catalog file " + catalog.getAnnotation(I18nCatalog.class).catalog()
+								+ ": " + e, catalog);
 			}
 		}
 
 		return true;
 	}
 
-	private void createI18nProperties(Filer filer, Messager messager,
-			TypeElement type) throws IOException {
+	private static void createI18nProperties(Filer filer, Messager messager, TypeElement type) throws IOException {
 		I18nCatalog annotation = type.getAnnotation(I18nCatalog.class);
-		messager.printMessage(MESSAGE_KIND, "Processing i18n catalog "
-				+ annotation.catalog(), type);
+		messager.printMessage(MESSAGE_KIND, "Processing i18n catalog " + annotation.catalog(), type);
 
 		String fqn = type.getQualifiedName().toString();
 		int separator = fqn.lastIndexOf('.');
 		FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT,
-				separator == -1 ? "" : fqn.substring(0, separator),
-				annotation.catalog() + ".properties", type);
+				separator == -1 ? "" : fqn.substring(0, separator), annotation.catalog() + ".properties", type);
 
 		try (OutputStream os = file.openOutputStream()) {
 			for (Element enclosed : type.getEnclosedElements()) {
 				I18n i18n = enclosed.getAnnotation(I18n.class);
 				if (enclosed.getKind() == ElementKind.ENUM_CONSTANT) {
-					String line = MessageFormat.format(
-							I18N_PROPERTY_LINE_PATTERN,
-							i18n.key().isEmpty() ? enclosed.getSimpleName()
-									.toString() : i18n.key(), i18n.value());
+					String line = MessageFormat.format(I18N_PROPERTY_LINE_PATTERN, i18n.key().isEmpty() ? enclosed
+							.getSimpleName().toString() : i18n.key(), i18n.value());
 					os.write(line.getBytes());
 
 					if (!i18n.plural().isEmpty()) {
-						String plural = MessageFormat
-								.format(I18N_PROPERTY_LINE_PLURAL_PATTERN,
-										i18n.key().isEmpty() ? enclosed
-												.getSimpleName().toString()
-												: i18n.key(), i18n.plural());
+						String plural = MessageFormat.format(I18N_PROPERTY_LINE_PLURAL_PATTERN,
+								i18n.key().isEmpty() ? enclosed.getSimpleName().toString() : i18n.key(), i18n.plural());
 						os.write(plural.getBytes());
 					}
 				}

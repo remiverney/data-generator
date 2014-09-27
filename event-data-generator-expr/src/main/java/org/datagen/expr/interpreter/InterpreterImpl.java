@@ -145,7 +145,7 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 
 	@Override
 	public Map<String, Value> eval() {
-		return sorted.stream().collect(Collectors.toMap(Function.<String> identity(), x -> {
+		return sorted.stream().collect(Collectors.<String, String, Value> toMap(Function.<String> identity(), x -> {
 			Value value = expressions.get(x).getRoot().eval(context);
 			setField(x, value, true);
 			return value;
@@ -154,7 +154,7 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 
 	@Override
 	public Map<String, String> evalToString() {
-		return sorted.stream().collect(Collectors.toMap(Function.<String> identity(), x -> {
+		return sorted.stream().collect(Collectors.<String, String, String> toMap(Function.<String> identity(), x -> {
 			Value value = expressions.get(x).getRoot().eval(context);
 			setField(x, value, true);
 			return value.toValueString(formatContext);

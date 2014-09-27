@@ -142,10 +142,6 @@ public class JavaRef implements Node {
 		}
 	}
 
-	public List<Node> getParameters() {
-		return parameters;
-	}
-
 	@Override
 	public List<Node> getChildren() {
 		return isMethodRef() ? parameters : Node.super.getChildren();

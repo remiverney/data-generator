@@ -11,6 +11,8 @@ public enum Arithmetic implements Operator<Arithmetic> {
 	MOD("%", Precedence.MUL, ValueOperation::mod, DerivationOperation::nonDerivable),
 	NEG("-", Precedence.NEG, null, DerivationOperation::neg),
 	POW("^", Precedence.POW, ValueOperation::pow, DerivationOperation::pow),
+	SHL("<<", Precedence.SHIFT, ValueOperation::shl, DerivationOperation::nonDerivable),
+	SHR(">>", Precedence.SHIFT, ValueOperation::shr, DerivationOperation::nonDerivable),
 	FACT("!", Precedence.FACT, null, DerivationOperation::nonDerivable);
 
 	private final String symbol;

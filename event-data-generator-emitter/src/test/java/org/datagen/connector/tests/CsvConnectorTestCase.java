@@ -40,30 +40,28 @@ public class CsvConnectorTestCase {
 	public void test() throws IOException {
 		ConnectorFactory factory = new ConnectorFactory();
 		ConfigBuilder<BuilderParameter<?>> config = factory.getConfigBuilder();
-		config.set(CsvConnectorParameters.FILE_DIRECTORY, new File(".\\"));
-		OutputConnector<?, ConnectorEvent> connector = factory.get("csv",
-				"mycsv", config.build());
+		config.set(CsvConnectorParameters.FILE_DIRECTORY, new File(".\\target"));
+		try (OutputConnector<?, ConnectorEvent> connector = factory.get("csv", "mycsv", config.build())) {
 
-		DataRecord record = new DataRecord() {
+			DataRecord record = new DataRecord() {
 
-			private static final long serialVersionUID = 1L;
+				private static final long serialVersionUID = 1L;
 
-			@Override
-			public DataDefinition getDefinition() {
-				return null;
-			}
+				@Override
+				public DataDefinition getDefinition() {
+					return null;
+				}
 
-			@Override
-			public Serializable[] getValues() {
-				return new Serializable[] { 12, "azerty", true };
-			}
+				@Override
+				public Serializable[] getValues() {
+					return new Serializable[] { 12, "azerty", true };
+				}
 
-		};
-		connector.open();
-		connector.emit(record);
-		connector.emit(record);
-
-		connector.close();
+			};
+			connector.open();
+			connector.emit(record);
+			connector.emit(record);
+		}
 	}
 
 }

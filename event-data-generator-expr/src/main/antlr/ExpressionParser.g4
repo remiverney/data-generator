@@ -52,6 +52,10 @@ expr returns [Node node]: p=primary
                           {$node = optimizer.optimize(new ArrayRangeRef($a.node, $i.node, $i2.node));}
                          | e=expr '!'
                           {$node = optimizer.optimize(new Factorial($e.node));}
+                        | e1=expr '>>' e2=expr
+                          {$node = optimizer.optimize(new ArithmeticOp($e1.node, $e2.node, Arithmetic.SHR));}
+                        | e1=expr '<<' e2=expr
+                          {$node = optimizer.optimize(new ArithmeticOp($e1.node, $e2.node, Arithmetic.SHL));}
                         | '+' e=expr
                           {$node = $e.node;}
                         | '-' e=expr

@@ -3,6 +3,7 @@ package org.datagen.expr.ast.intf;
 public enum Precedence {
 	NONE,
 	FACT,
+	SHIFT,
 	NEG,
 	POW,
 	MUL,

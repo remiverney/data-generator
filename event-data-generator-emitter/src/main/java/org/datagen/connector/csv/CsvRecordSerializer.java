@@ -18,8 +18,7 @@ public class CsvRecordSerializer implements RecordSerializer {
 	}
 
 	@Override
-	public int serialize(OutputStream writer, DataRecord record)
-			throws IOException {
+	public int serialize(OutputStream writer, DataRecord record) throws IOException {
 		int len = 0;
 		boolean first = true;
 
@@ -42,7 +41,7 @@ public class CsvRecordSerializer implements RecordSerializer {
 		return len;
 	}
 
-	private int write(OutputStream writer, byte[] buffer) throws IOException {
+	private static int write(OutputStream writer, byte[] buffer) throws IOException {
 		writer.write(buffer);
 
 		return buffer.length;

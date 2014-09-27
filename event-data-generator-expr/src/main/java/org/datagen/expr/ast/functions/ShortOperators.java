@@ -14,10 +14,9 @@ import org.datagen.expr.ast.nodes.VariableRef;
 
 public final class ShortOperators {
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static final class ShortOperatorOp extends BinaryOp {
 
-		@SuppressWarnings("unchecked")
 		public ShortOperatorOp(Node lhs, Node rhs, Operator<?> operator) {
 			super(lhs, rhs, (Enum) operator);
 		}
