@@ -31,7 +31,14 @@ public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends UnaryOp<
 
 	@Override
 	public Value eval(EvalContext context) {
-		return operator.getEvaluator().eval(context, this, lhs.eval(context), rhs.eval(context));
+		Value lvalue = lhs.eval(context);
+		Value rvalue = rhs.eval(context);
+
+		try {
+			return operator.getEvaluator().eval(context, this, lvalue, rvalue);
+		} catch (ArithmeticException e) {
+			throw new org.datagen.expr.ast.exception.ArithmeticException(this, operator, lvalue, rvalue, e);
+		}
 	}
 
 	@Override

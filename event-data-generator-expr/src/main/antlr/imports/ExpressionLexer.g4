@@ -35,7 +35,7 @@ StringLiteral : '"' SCharSequence? '"'
 fragment IdentifierNondigit : Nondigit
 ;
 
-fragment Nondigit : [a-zA-Z$_]
+fragment Nondigit : [a-zA-Z_]
 ;
 
 fragment Digit : [0-9]

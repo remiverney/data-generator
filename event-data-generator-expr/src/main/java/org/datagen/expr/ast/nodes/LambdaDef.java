@@ -1,6 +1,7 @@
 package org.datagen.expr.ast.nodes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -50,28 +51,22 @@ public class LambdaDef implements Value, Lambda {
 
 			@Override
 			public Value eval(EvalContext context) {
-				return super.eval(context);
+				return this;
 			}
 
 			@Override
 			public Value eval(EvalContext context, Value... parameters) {
 				if (parameters.length != LambdaDef.this.parameters.size()) {
-					throw new BadArgumentsNumberException(this,
-							parameters.length, LambdaDef.this.parameters.size());
+					throw new BadArgumentsNumberException(this, parameters.length, LambdaDef.this.parameters.size());
 				}
 
-				Value values[] = new Value[LambdaDef.this.parameters.size()];
-
-				for (int i = 0; i < LambdaDef.this.parameters.size(); i++) {
-					values[i] = parameters[i].eval(context);
-				}
+				Value values[] = Arrays.stream(parameters).map(x -> x.eval(context)).toArray(Value[]::new);
 
 				context.pushContext();
 
 				context.setVariable(ThisRef.THIS_VARIABLE, this);
 				for (int i = 0; i < LambdaDef.this.parameters.size(); i++) {
-					context.setVariable(LambdaDef.this.parameters.get(i),
-							values[i]);
+					context.setVariable(LambdaDef.this.parameters.get(i), values[i]);
 				}
 				context.pushContext(closure);
 
@@ -103,8 +98,7 @@ public class LambdaDef implements Value, Lambda {
 
 	@Override
 	public Value eval(EvalContext context, Value... parameters) {
-		throw new UnsupportedOperationException(
-				"attempted to call a lambda that was not evaluated before");
+		throw new UnsupportedOperationException("attempted to call a lambda that was not evaluated before");
 	}
 
 	@Override
@@ -132,19 +126,14 @@ public class LambdaDef implements Value, Lambda {
 
 		AstWalker.walk(this, VariableRef.class, visitor, true);
 
-		Map<String, Value> closure = references
-				.stream()
-				.filter(x -> context.getVariable(x) != null)
-				.collect(
-						Collectors.toMap(Function.<String> identity(),
-								x -> context.getVariable(x)));
+		Map<String, Value> closure = references.stream().filter(x -> context.getVariable(x) != null)
+				.collect(Collectors.toMap(Function.<String> identity(), x -> context.getVariable(x)));
 
 		return closure;
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		builder.append('(');
 		context.formatListString(builder, parameters, ',');
 		context.spacing(builder);

@@ -8,5 +8,6 @@ public enum Keywords {
 	END,
 	TYPEOF,
 	PARALLEL,
-	EVAL
+	EVAL,
+	DERIV
 }

@@ -114,6 +114,8 @@ primary returns [Node node]: '(' e=expr ')'
                              {$node = optimizer.optimize(new TypeOf($e.node));}
                            | 'EVAL' '(' e=expr ')'
                              {$node = optimizer.optimize(new Eval($e.node, this.loader));}
+                           | 'DERIV' '(' v=expr ',' e=expr ')'
+                             {$node = optimizer.optimize(new Deriv($e.node, $v.node));}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_PROPERTY_REFERENCE)}? '$' Identifier
                              {$node = optimizer.optimize(new PropertyRef($Identifier.text));}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FIELD_REFERENCE)}? col=columnref

@@ -2,14 +2,12 @@ package org.datagen.log;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Priority;
 
 public class Logger extends org.apache.log4j.Logger {
 
 	@FunctionalInterface
 	public interface LoggerClassResolver {
-		org.apache.log4j.Logger getLogger(
-				@SuppressWarnings("rawtypes") Class clazz);
+		org.apache.log4j.Logger getLogger(@SuppressWarnings("rawtypes") Class clazz);
 	}
 
 	public static final LoggerClassResolver get = Logger::getLogger;
@@ -82,15 +80,15 @@ public class Logger extends org.apache.log4j.Logger {
 		}
 	}
 
-	public void log(Priority priority, Log<?> message, Throwable t) {
-		if (isEnabledFor(priority)) {
-			super.log(priority, message.log(), t);
+	public void log(Level level, Log<?> message, Throwable t) {
+		if (isEnabledFor(level)) {
+			super.log(level, message.log(), t);
 		}
 	}
 
-	public void log(Priority priority, Log<?> message) {
-		if (isEnabledFor(priority)) {
-			super.log(priority, message.log());
+	public void log(Level level, Log<?> message) {
+		if (isEnabledFor(level)) {
+			super.log(level, message.log());
 		}
 	}
 
@@ -107,11 +105,15 @@ public class Logger extends org.apache.log4j.Logger {
 	}
 
 	public void trace(Log<?> message) {
-		super.trace(message.log());
+		if (isEnabledFor(Level.TRACE)) {
+			super.trace(message.log());
+		}
 	}
 
 	public void trace(Log<?> message, Throwable t) {
-		super.trace(message.log(), t);
+		if (isEnabledFor(Level.TRACE)) {
+			super.trace(message.log(), t);
+		}
 	}
 
 }

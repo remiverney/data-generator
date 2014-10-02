@@ -83,4 +83,19 @@ public class Eval implements Node {
 		Node.super.validate(context);
 	}
 
+	@Override
+	public Node optimize(EvalContext context) {
+		if ((expr instanceof Value) && (((Value) expr).getType() == ValueType.STRING)) {
+			try {
+				ParserResult result = Parser.parse(((LiteralValue) expr).getString(), context.getInterpreter()
+						.getConfiguration(), context, this.loader);
+				return result.getRoot();
+			} catch (ParsingException e) {
+				throw new DynamicEvaluationException(this, ((LiteralValue) expr).getString(), e);
+			}
+		} else {
+			return Node.super.optimize(context);
+		}
+	}
+
 }

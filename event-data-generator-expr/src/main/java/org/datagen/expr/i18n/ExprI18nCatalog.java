@@ -7,6 +7,9 @@ import org.datagen.config.I18nCatalogIf;
 @I18nCatalog(catalog = ExprI18nCatalog.CATALOG_NAME)
 public enum ExprI18nCatalog implements I18nCatalogIf {
 
+	@I18n("Arithmetic error for operator \"{0}\": \"{1}\"")
+	ARITHMETIC_ERROR,
+
 	@I18n("Invalid number of arguments when calling function, expected {0}, found {1}")
 	BAD_ARGUMENT_NUMBER,
 
@@ -18,6 +21,12 @@ public enum ExprI18nCatalog implements I18nCatalogIf {
 
 	@I18n("Incompatible attribute \"{0}\" applied on type \"{1}\"")
 	INCOMPATIBLE_ATTRIBUTE,
+
+	@I18n("Incompatible returned type \"{0}\" of function \"{1}\"")
+	INCOMPATIBLE_FUNCTION_RETURN_TYPE,
+
+	@I18n("Invalid null returned value of function \"{0}\"")
+	INCOMPATIBLE_FUNCTION_RETURN_NULL,
 
 	@I18n("Incompatible argument type \"{0}\" for operator \"{1}\"")
 	INCOMPATIBLE_TYPES_UNARY,
