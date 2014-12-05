@@ -2,9 +2,10 @@ package org.datagen.connector;
 
 import org.datagen.extension.PluggableExtensionFactoryImpl;
 import org.datagen.factory.BuilderParameter;
+import org.datagen.utils.annotation.Immutable;
 
-public class ConnectorFactory
-		extends
+@Immutable
+public class ConnectorFactory extends
 		PluggableExtensionFactoryImpl<OutputConnector<?, ConnectorEvent>, BuilderParameter<?>> {
 
 	public ConnectorFactory() {

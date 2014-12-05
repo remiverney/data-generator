@@ -4,7 +4,7 @@
   <name>Event data generator UI</name>
   
   <properties>
-  	<eclipse.home>c:/Program Files/Java/eclipse</eclipse.home>
+  	<eclipse.home>c:/Program Files/Java/eclipse 4.4</eclipse.home>
   </properties>
   
   <parent>

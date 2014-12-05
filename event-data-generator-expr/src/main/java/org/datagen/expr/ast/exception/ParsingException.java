@@ -3,7 +3,9 @@ package org.datagen.expr.ast.exception;
 import java.util.Collection;
 
 import org.datagen.exception.CompoundException;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ParsingException extends CompoundException {
 
 	private static final long serialVersionUID = 1L;

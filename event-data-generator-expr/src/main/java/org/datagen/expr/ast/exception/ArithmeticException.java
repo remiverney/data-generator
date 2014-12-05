@@ -5,7 +5,9 @@ import java.text.MessageFormat;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ArithmeticException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -21,7 +23,7 @@ public class ArithmeticException extends EvaluationException {
 				lhs, rhs, cause);
 	}
 
-	public ArithmeticException(Node node, String message, Operator<?> operator, Value lhs, Value rhs, Exception cause) {
+	private ArithmeticException(Node node, String message, Operator<?> operator, Value lhs, Value rhs, Exception cause) {
 		super(node, message, cause);
 		this.operator = operator;
 		this.lhs = lhs;

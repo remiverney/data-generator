@@ -12,7 +12,9 @@ import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Ternary implements Node {
 
 	private final Node condition;

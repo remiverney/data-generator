@@ -5,8 +5,10 @@ import java.util.concurrent.Callable;
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
-public class ValueComputeTask implements Callable<Value> {
+@Immutable
+class ValueComputeTask implements Callable<Value> {
 
 	private final Node expr;
 	private final EvalContext context;

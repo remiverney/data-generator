@@ -3,7 +3,9 @@ package org.datagen.expr.ast.exception;
 import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class UnknownAttributeException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -16,7 +18,7 @@ public class UnknownAttributeException extends EvaluationException {
 		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, attribute), attribute);
 	}
 
-	public UnknownAttributeException(Node node, String message, String attribute) {
+	private UnknownAttributeException(Node node, String message, String attribute) {
 		super(node, message);
 		this.attribute = attribute;
 	}

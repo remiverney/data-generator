@@ -7,7 +7,9 @@ import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public abstract class UnaryOp<O extends Operator<O>> implements Node {
 
 	protected final O operator;
@@ -43,8 +45,7 @@ public abstract class UnaryOp<O extends Operator<O>> implements Node {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		if (prefixed) {
 			builder.append(operator.getSymbol());
 		}

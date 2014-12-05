@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.Mapped;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class SimpleValueFormatContext implements ValueFormatContext {
 
 	private static final long serialVersionUID = 1L;
@@ -36,14 +38,12 @@ public class SimpleValueFormatContext implements ValueFormatContext {
 
 	@Override
 	public String formatLambda(Lambda lambda) {
-		throw new UnsupportedOperationException(
-				"Cannot format a lambda function");
+		throw new UnsupportedOperationException("Cannot format a lambda function");
 	}
 
 	@Override
 	public String formatArray(Array array) {
-		return array.getAll().stream().sequential()
-				.map(x -> x.eval(null).toValueString(this))
+		return array.getAll().stream().sequential().map(x -> x.eval(null).toValueString(this))
 				.collect(Collectors.joining(", ", "{ ", " }"));
 	}
 
@@ -55,8 +55,7 @@ public class SimpleValueFormatContext implements ValueFormatContext {
 				.stream()
 				.sequential()
 				.map(x -> x.getKey().eval(null).toValueString(this) + " => "
-						+ x.getValue().eval(null).toValueString(this))
-				.collect(Collectors.joining(", ", "{ ", " }"));
+						+ x.getValue().eval(null).toValueString(this)).collect(Collectors.joining(", ", "{ ", " }"));
 	}
 
 }

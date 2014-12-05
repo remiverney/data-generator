@@ -4,15 +4,19 @@ import java.io.Closeable;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 
 public interface ParallelExecutor extends Closeable {
 
-	List<Value> eval(EvalContext context, Collection<Node> expr);
+	@Nonnull
+	List<Value> eval(@Nonnull EvalContext context, @Nonnull Collection<Node> expr);
 
-	List<Value> eval(EvalContext context, Node... expr);
+	@Nonnull
+	List<Value> eval(@Nonnull EvalContext context, Node... expr);
 
 	int getParallelism();
 

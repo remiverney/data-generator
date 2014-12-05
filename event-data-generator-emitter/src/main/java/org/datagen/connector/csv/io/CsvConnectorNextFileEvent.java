@@ -1,6 +1,8 @@
-package org.datagen.connector.csv;
+package org.datagen.connector.csv.io;
 
 import java.io.File;
+
+import org.datagen.connector.csv.CsvConnectorEvent;
 
 public interface CsvConnectorNextFileEvent extends CsvConnectorEvent {
 

@@ -1,5 +1,8 @@
 package org.datagen.core.scheduler;
 
+import org.datagen.utils.annotation.Immutable;
+
+@Immutable
 public class TaskTerminationCriteria {
 
 	public static enum Criteria {
@@ -12,8 +15,7 @@ public class TaskTerminationCriteria {
 	private final long duration;
 	private final long executions;
 
-	public TaskTerminationCriteria(Criteria criteria, long duration,
-			long executions) {
+	public TaskTerminationCriteria(Criteria criteria, long duration, long executions) {
 		this.criteria = criteria;
 		this.duration = duration;
 		this.executions = executions;

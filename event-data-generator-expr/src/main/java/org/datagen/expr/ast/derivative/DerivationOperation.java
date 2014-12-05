@@ -34,7 +34,7 @@ public final class DerivationOperation {
 		} else if (drhs == LiteralValue.ZERO) {
 			return dlhs;
 		} else {
-			return new ArithmeticOp(dlhs, drhs, Arithmetic.ADD);
+			return new ArithmeticOp(dlhs, drhs, Arithmetic.ADD).optimize(context.getEvalContext());
 		}
 	}
 
@@ -51,7 +51,7 @@ public final class DerivationOperation {
 		} else if (drhs == LiteralValue.ZERO) {
 			return dlhs;
 		} else {
-			return new ArithmeticOp(dlhs, drhs, Arithmetic.SUB);
+			return new ArithmeticOp(dlhs, drhs, Arithmetic.SUB).optimize(context.getEvalContext());
 		}
 	}
 
@@ -67,14 +67,14 @@ public final class DerivationOperation {
 			if (drhs == LiteralValue.ZERO) {
 				return LiteralValue.ZERO;
 			} else {
-				return new ArithmeticOp(lhs, drhs, Arithmetic.MUL);
+				return new ArithmeticOp(lhs, drhs, Arithmetic.MUL).optimize(context.getEvalContext());
 			}
 		} else {
 			if (drhs == LiteralValue.ZERO) {
-				return new ArithmeticOp(dlhs, rhs, Arithmetic.MUL);
+				return new ArithmeticOp(dlhs, rhs, Arithmetic.MUL).optimize(context.getEvalContext());
 			} else {
 				return new ArithmeticOp(new ArithmeticOp(lhs, drhs, Arithmetic.MUL), new ArithmeticOp(dlhs, rhs,
-						Arithmetic.MUL), Arithmetic.ADD);
+						Arithmetic.MUL), Arithmetic.ADD).optimize(context.getEvalContext());
 			}
 		}
 	}
@@ -116,7 +116,7 @@ public final class DerivationOperation {
 		if (drhs instanceof Negation) {
 			return ((Negation) drhs).getRhs();
 		} else {
-			return new Negation(drhs);
+			return new Negation(drhs).optimize(context.getEvalContext());
 		}
 	}
 
@@ -124,6 +124,7 @@ public final class DerivationOperation {
 		return pow(context, operator.getLhs(), operator.getRhs());
 	}
 
+	// (f^g)' = (g*f'/f + g'*ln(f)) * f^g
 	@SuppressWarnings("unused")
 	private static Node pow(DerivationContext context, Node lhs, Node rhs) {
 		Node dlhs = context.derive(lhs);

@@ -1,8 +1,8 @@
 package org.datagen.connector.tests;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.datagen.connector.ConnectorEvent;
 import org.datagen.connector.ConnectorFactory;
@@ -40,8 +40,8 @@ public class CsvConnectorTestCase {
 	public void test() throws IOException {
 		ConnectorFactory factory = new ConnectorFactory();
 		ConfigBuilder<BuilderParameter<?>> config = factory.getConfigBuilder();
-		config.set(CsvConnectorParameters.FILE_DIRECTORY, new File(".\\target"));
-		try (OutputConnector<?, ConnectorEvent> connector = factory.get("csv", "mycsv", config.build())) {
+		config.set(CsvConnectorParameters.FILE_DIRECTORY, ".\\target");
+		try (OutputConnector<?, ConnectorEvent> connector = factory.get("csv", "mycsv", Optional.of(config.build()))) {
 
 			DataRecord record = new DataRecord() {
 
@@ -59,6 +59,9 @@ public class CsvConnectorTestCase {
 
 			};
 			connector.open();
+			connector.emit(record);
+			connector.emit(record);
+			connector.emit(record);
 			connector.emit(record);
 			connector.emit(record);
 		}

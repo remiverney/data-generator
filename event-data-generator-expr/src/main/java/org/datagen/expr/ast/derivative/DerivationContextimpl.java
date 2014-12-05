@@ -3,16 +3,21 @@ package org.datagen.expr.ast.derivative;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class DerivationContextimpl implements DerivationContext {
 
 	private final String variable;
+	private final EvalContext evalContext;
 
 	private final Map<Node, Node> cache = new HashMap<>();
 
-	public DerivationContextimpl(String variable) {
+	public DerivationContextimpl(String variable, EvalContext evalContext) {
 		this.variable = variable;
+		this.evalContext = evalContext;
 	}
 
 	@Override
@@ -22,15 +27,12 @@ public class DerivationContextimpl implements DerivationContext {
 
 	@Override
 	public Node derive(Node node) {
-		Node cached = cache.get(node);
-		if (cached != null) {
-			return cached;
-		}
+		return cache.computeIfAbsent(node, n -> n.derivative(this).optimize(evalContext));
+	}
 
-		cached = node.derivative(this).optimize(null);
-		cache.put(node, cached);
-
-		return cached;
+	@Override
+	public EvalContext getEvalContext() {
+		return this.evalContext;
 	}
 
 }

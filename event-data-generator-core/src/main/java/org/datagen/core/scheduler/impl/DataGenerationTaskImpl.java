@@ -12,15 +12,16 @@ import org.datagen.core.scheduler.TaskTerminationCriteria;
 import org.datagen.dataset.DataDefinition;
 import org.datagen.dataset.DataRecord;
 import org.datagen.expr.interpreter.Interpreter;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class DataGenerationTaskImpl implements DataGenerationTask {
 
 	private final Interpreter interpreter;
 	private final OutputConnector<?, ?> connector;
 	private final DataDefinition definition;
 
-	public DataGenerationTaskImpl(TaskTerminationCriteria termination,
-			long period, Interpreter interpreter,
+	public DataGenerationTaskImpl(TaskTerminationCriteria termination, long period, Interpreter interpreter,
 			OutputConnector<?, ?> connector, DataDefinition definition) {
 		this.interpreter = interpreter;
 		this.connector = connector;
@@ -47,18 +48,15 @@ public class DataGenerationTaskImpl implements DataGenerationTask {
 
 			@Override
 			public Serializable[] getValues() {
-				return Arrays
-						.stream(DataGenerationTaskImpl.this.definition
-								.getFields()).map(x -> values.get(x.getName()))
-						.toArray(Serializable[]::new);
+				return Arrays.stream(DataGenerationTaskImpl.this.definition.getFields())
+						.map(x -> values.get(x.getName())).toArray(Serializable[]::new);
 			}
 		};
 
 		try {
 			connector.emit(record);
 		} catch (IOException e) {
-			throw new TaskException(
-					"Failed to emit data record to output connector", e);
+			throw new TaskException("Failed to emit data record to output connector", e);
 		}
 
 		return null;

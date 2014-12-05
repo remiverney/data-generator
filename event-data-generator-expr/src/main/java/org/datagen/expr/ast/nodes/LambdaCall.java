@@ -10,7 +10,9 @@ import org.datagen.expr.ast.exception.NotALambdaException;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class LambdaCall implements Node {
 
 	private final Node lambda;
@@ -42,15 +44,12 @@ public class LambdaCall implements Node {
 			throw new NotALambdaException(this, resolved.getType());
 		}
 
-		return ((Lambda) resolved).eval(
-				context,
-				parameters.stream().map(p -> p.eval(context))
-						.collect(Collectors.toCollection(ArrayList::new)));
+		return ((Lambda) resolved).eval(context,
+				parameters.stream().map(p -> p.eval(context)).collect(Collectors.toCollection(ArrayList::new)));
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		lambda.toString(builder, context);
 		builder.append('(');
 		context.formatList(builder, parameters, ',');

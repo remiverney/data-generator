@@ -1,6 +1,7 @@
 package org.datagen.core.scheduler.impl;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.datagen.core.scheduler.JoinedTaskEvent;
 import org.datagen.core.scheduler.SchedulerEvent;
@@ -12,20 +13,18 @@ import org.datagen.core.scheduler.policy.TaskTerminationPolicy;
 import org.datagen.utils.Observable;
 import org.datagen.utils.Observer;
 
-public class TaskThread<T extends SchedulerTask> extends Thread implements
-		Observable<TaskThread<T>, SchedulerEvent> {
+public class TaskThread<T extends SchedulerTask> extends Thread implements Observable<TaskThread<T>, SchedulerEvent> {
 
 	private final T task;
-	private final TaskExecutionPolicy scheduling;
-	private final TaskTerminationPolicy termination;
-	private Observer<TaskThread<T>, SchedulerEvent> observer;
+	private final Optional<TaskExecutionPolicy> scheduling;
+	private final Optional<TaskTerminationPolicy> termination;
+	private Optional<Observer<TaskThread<T>, SchedulerEvent>> observer;
 
-	public TaskThread(T task, TaskExecutionPolicy scheduling,
-			TaskTerminationPolicy termination) {
+	public TaskThread(T task, Optional<TaskExecutionPolicy> scheduling, Optional<TaskTerminationPolicy> termination) {
 		this.task = task;
 		this.scheduling = scheduling;
 		this.termination = termination;
-		this.observer = null;
+		this.observer = Optional.empty();
 	}
 
 	@Override
@@ -48,14 +47,12 @@ public class TaskThread<T extends SchedulerTask> extends Thread implements
 			e.printStackTrace();
 		}
 
-		if (observer != null) {
-			observer.notify(this, new JoinedTaskEvent<SchedulerTask>(task));
-		}
+		observer.ifPresent(x -> x.notify(this, new JoinedTaskEvent<SchedulerTask>(task)));
 	}
 
 	private void sleep() throws InterruptedException {
-		if (scheduling != null) {
-			scheduling.waitNext();
+		if (scheduling.isPresent()) {
+			scheduling.get().waitNext();
 		}
 	}
 
@@ -63,29 +60,26 @@ public class TaskThread<T extends SchedulerTask> extends Thread implements
 		try {
 			task.call();
 		} catch (TaskException e) {
-			if (observer != null) {
-				observer.notify(this, new TaskExceptionEvent<SchedulerTask>(
-						task, e));
-			}
+			observer.ifPresent(x -> x.notify(this, new TaskExceptionEvent<SchedulerTask>(task, e)));
 		}
 	}
 
 	private boolean isFinished() {
-		return (termination != null) && (termination.finished());
+		return (termination.isPresent()) && (termination.get().finished());
 	}
 
 	@Override
 	public void addObserver(Observer<TaskThread<T>, SchedulerEvent> observer) {
-		this.observer = observer;
+		this.observer = Optional.of(observer);
 	}
 
 	@Override
 	public void removeObserver(Observer<TaskThread<T>, SchedulerEvent> observer) {
-		this.observer = null;
+		this.observer = Optional.empty();
 	}
 
 	@Override
 	public boolean isObserved() {
-		return this.observer != null;
+		return this.observer.isPresent();
 	}
 }

@@ -1,4 +1,4 @@
-package org.datagen.connector.csv;
+package org.datagen.connector.csv.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,11 +10,13 @@ import org.datagen.dataset.DataRecord;
 public class CsvRecordSerializer implements RecordSerializer {
 
 	private final byte[] separator;
-	private final String nullValue;
+	private final byte[] nullValue;
+	private final byte[] endline;
 
-	public CsvRecordSerializer(String separator, String nullValue) {
+	public CsvRecordSerializer(String separator, String nullValue, String endline) {
 		this.separator = separator.getBytes();
-		this.nullValue = nullValue;
+		this.nullValue = nullValue.getBytes();
+		this.endline = endline.getBytes();
 	}
 
 	@Override
@@ -31,12 +33,14 @@ public class CsvRecordSerializer implements RecordSerializer {
 
 			if (field == null) {
 				if (nullValue != null) {
-					len += write(writer, nullValue.getBytes());
+					len += write(writer, nullValue);
 				}
 			} else {
 				len += write(writer, field.toString().getBytes());
 			}
 		}
+
+		len += write(writer, endline);
 
 		return len;
 	}

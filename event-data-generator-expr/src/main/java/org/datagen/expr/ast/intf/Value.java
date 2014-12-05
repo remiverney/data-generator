@@ -1,5 +1,7 @@
 package org.datagen.expr.ast.intf;
 
+import javax.annotation.Nonnull;
+
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ValueFormatContext;
 
@@ -37,7 +39,9 @@ public interface Value extends Node {
 		return false;
 	}
 
+	@Nonnull
 	ValueType getType();
 
+	@Nonnull
 	String toValueString(ValueFormatContext context);
 }

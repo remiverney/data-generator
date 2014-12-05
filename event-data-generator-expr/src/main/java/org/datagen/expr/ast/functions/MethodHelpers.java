@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.datagen.expr.ast.nodes.LiteralValue;
 
 public final class MethodHelpers {
@@ -43,7 +45,7 @@ public final class MethodHelpers {
 		}
 	}
 
-	public static LiteralValue toLiteralValue(Object value) {
+	public static LiteralValue toLiteralValue(@Nonnull Object value) {
 		MethodHandle handle = CONSTRUCTORS.get(value.getClass());
 		if (handle == null) {
 			return null;

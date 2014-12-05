@@ -6,37 +6,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
 
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.ast.context.ValidationResult;
 import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.interpreter.Interpreter;
-import org.datagen.expr.interpreter.InterpreterEvent;
 import org.datagen.expr.interpreter.InterpreterFactory;
 import org.datagen.expr.interpreter.InterpreterParameters;
 import org.datagen.factory.ConfigBuilder;
-import org.datagen.utils.Observable;
-import org.datagen.utils.Observer;
+import org.datagen.mbean.ManageableRegistry;
+import org.datagen.mbean.ManageableRegistryImpl;
 
 public class Inter {
 
-	// @FunctionalInterface
-	// private interface Optimizer<T extends Node> {
-	// // T optimize(Node node);
-	// T optimize(Node n, EvalContext ctx);
-	// }
-	//
-	// // private Optimizer<?> optimizer = (x -> x.optimize(null));
-	// private Optimizer<?> optimizer = Node::optimize;
-	//
-	// public Inter() {
-	// Node n = optimizer.optimize(new Not(null), null);
-	// CaseWhen when = optimizer.optimize(new CaseWhen(null, null), null);
-	// }
-
 	public static void main(String[] args) throws FileNotFoundException, CircularDependencyException,
-			UnresolvedDependencyException, IOException, ParsingException {
+			UnresolvedDependencyException, IOException, ParsingException, MalformedObjectNameException,
+			InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+		@SuppressWarnings("resource")
+		ManageableRegistry server = new ManageableRegistryImpl("com.datagen");
 		Map<String, String> library = new HashMap<>();
 		library.put("PI", "3.14159265358979323846");
 		library.put("E", "2.7182818284590452354");
@@ -68,7 +62,8 @@ public class Inter {
 
 		ConfigBuilder<InterpreterParameters> builder = InterpreterFactory.instance().getConfigBuilder()
 				.enable(InterpreterParameters.ALLOW_LAMBDA_DEFINITION);
-		Interpreter inter = InterpreterFactory.instance().get(builder.build());
+		Interpreter inter = InterpreterFactory.instance().get(Optional.of(builder.build()));
+		server.register(inter);
 		inter.registerLibrary("mylib", library);
 		// inter.registerExpressionsStream(expressions);
 		ValidationResult validation = inter.registerExpression("col5",
@@ -76,14 +71,7 @@ public class Inter {
 
 		System.out.println("validation status:\n" + validation);
 
-		inter.addObserver(new Observer<Interpreter, InterpreterEvent>() {
-
-			@Override
-			public void notify(Observable<Interpreter, InterpreterEvent> observable, InterpreterEvent event) {
-				// System.out.println("event: col=" + event.getColumn() +
-				// " val="
-				// + event.getValue() + " old=" + event.getOldValue());
-			}
+		inter.addObserver((x, y) -> {
 		});
 
 		System.out.println("expr: " + inter.get("col5"));
@@ -97,5 +85,9 @@ public class Inter {
 
 			// inter.nextSequence();
 		}
+
+		System.in.read();
+
+		server.close();
 	}
 }

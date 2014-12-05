@@ -7,7 +7,9 @@ import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public abstract class BinaryOp<O extends Enum<O> & Operator<O>> extends UnaryOp<O> {
 
 	protected final Node lhs;

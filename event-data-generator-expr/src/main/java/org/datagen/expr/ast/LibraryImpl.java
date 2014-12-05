@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class LibraryImpl implements Library {
 
 	private final String name;

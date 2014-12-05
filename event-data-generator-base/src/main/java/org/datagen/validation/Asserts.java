@@ -1,4 +1,7 @@
 package org.datagen.validation;
+
+import java.util.Optional;
+
 import org.datagen.log.Logger;
 
 public class Asserts {
@@ -25,6 +28,14 @@ public class Asserts {
 		Object check();
 	}
 
+	@FunctionalInterface
+	public static interface OptionalChecker<T> {
+		Optional<T> check();
+	}
+
+	private Asserts() {
+	}
+
 	public static void enable() {
 		enabled = true;
 	}
@@ -39,9 +50,6 @@ public class Asserts {
 
 	public static void setThrowRuntime(boolean runtime) {
 		Asserts.runtime = runtime;
-	}
-
-	private Asserts() {
 	}
 
 	public static void checkNotNull(RefChecker predicate) {
@@ -65,6 +73,28 @@ public class Asserts {
 			if (predicate.check() != null) {
 				checkFail(message);
 			}
+		}
+	}
+
+	public static <T> void checkNotEmpty(OptionalChecker<T> predicate) {
+		checkNotEmpty(predicate, CHECK_FAIL_NOT_NULL);
+	}
+
+	public static <T> void checkNotEmpty(OptionalChecker<T> predicate, String message) {
+		if (enabled) {
+			if (!predicate.check().isPresent()) {
+				checkFail(message);
+			}
+		}
+	}
+
+	public static <T> void checkEmpty(OptionalChecker<T> predicate) {
+		checkEmpty(predicate, CHECK_FAIL_NULL);
+	}
+
+	public static <T> void checkEmpty(OptionalChecker<T> predicate, String message) {
+		if (enabled) {
+			predicate.check().ifPresent((p) -> checkFail(message));
 		}
 	}
 

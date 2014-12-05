@@ -1,7 +1,9 @@
 package org.datagen.expr.ast.nodes;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public abstract class NodeBase implements Node {
 
 	private final int line;

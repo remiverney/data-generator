@@ -1,6 +1,7 @@
 package org.datagen.extension;
 
-public interface PluggableExtension {
+import org.datagen.utils.Identifiable;
 
-	String getName();
+public interface PluggableExtension extends Identifiable<String> {
+
 }

@@ -3,7 +3,9 @@ package org.datagen.expr.ast.exception;
 import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class OutBoundsArrayException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -14,12 +16,10 @@ public class OutBoundsArrayException extends EvaluationException {
 	private final long index;
 
 	public OutBoundsArrayException(Node node, long size, long index) {
-		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, index, size),
-				size, index);
+		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, index, size), size, index);
 	}
 
-	public OutBoundsArrayException(Node node, String message, long size,
-			long index) {
+	private OutBoundsArrayException(Node node, String message, long size, long index) {
 		super(node, message);
 		this.size = size;
 		this.index = index;

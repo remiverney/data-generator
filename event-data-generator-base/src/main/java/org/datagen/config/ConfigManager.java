@@ -2,27 +2,29 @@ package org.datagen.config;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 public interface ConfigManager {
 
-	void load(String path);
+	void load(@Nonnull String path);
 
 	void reset();
 
-	int getIntParameter(String name, int defValue);
+	int getIntParameter(@Nonnull String name, int defValue);
 
-	float getFloatParameter(String name, float defValue);
+	float getFloatParameter(@Nonnull String name, float defValue);
 
-	boolean getBooleanParameter(String name, boolean defValue);
+	boolean getBooleanParameter(@Nonnull String name, boolean defValue);
 
-	String getStringParameter(String name, String defValue);
+	String getStringParameter(@Nonnull String name, String defValue);
 
-	void setIntParameter(String name, int value);
+	void setIntParameter(@Nonnull String name, int value);
 
-	void setFloatParameter(String name, float value);
+	void setFloatParameter(@Nonnull String name, float value);
 
-	void setBooleanParameter(String name, boolean value);
+	void setBooleanParameter(@Nonnull String name, boolean value);
 
-	void setStringParameter(String name, String value);
+	void setStringParameter(@Nonnull String name, String value);
 
 	Map<String, String> getParameters();
 }

@@ -14,7 +14,9 @@ import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Deriv implements Node {
 
 	private final Node expr;
@@ -39,8 +41,8 @@ public class Deriv implements Node {
 			throw new IncompatibleArgumentException(this, 2, func.getType(), ValueType.LAMBDA);
 		}
 
-		return new DerivationContextimpl(((LiteralValue) value).getString()).derive(((Lambda) func).getBody()).eval(
-				context);
+		return new DerivationContextimpl(((LiteralValue) value).getString(), context).derive(((Lambda) func).getBody())
+				.eval(context);
 	}
 
 	public Node getExpr() {

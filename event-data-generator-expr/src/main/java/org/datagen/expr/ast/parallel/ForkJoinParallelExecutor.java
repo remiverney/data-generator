@@ -9,12 +9,16 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.context.PrivateDelegateEvalContextImpl;
 import org.datagen.expr.ast.exception.InterruptedParallelExecutionException;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ForkJoinParallelExecutor implements ParallelExecutor {
 
 	private final ForkJoinPool pool;
@@ -34,10 +38,8 @@ public class ForkJoinParallelExecutor implements ParallelExecutor {
 
 	@Override
 	public List<Value> eval(EvalContext context, Collection<Node> expr) {
-		List<ValueComputeTask> tasks = expr
-				.stream()
-				.map(x -> new ValueComputeTask(x,
-						new PrivateDelegateEvalContextImpl(context)))
+		List<ValueComputeTask> tasks = expr.stream()
+				.map(x -> new ValueComputeTask(x, new PrivateDelegateEvalContextImpl(context)))
 				.collect(Collectors.toList());
 
 		return processTasks(tasks);
@@ -45,14 +47,13 @@ public class ForkJoinParallelExecutor implements ParallelExecutor {
 
 	@Override
 	public List<Value> eval(EvalContext context, Node... expr) {
-		List<ValueComputeTask> tasks = Arrays.stream(expr)
-				.map(x -> new ValueComputeTask(x, context))
+		List<ValueComputeTask> tasks = Arrays.stream(expr).map(x -> new ValueComputeTask(x, context))
 				.collect(Collectors.toList());
 
 		return processTasks(tasks);
 	}
 
-	private List<Value> processTasks(List<ValueComputeTask> tasks) {
+	private @Nonnull List<Value> processTasks(@Nonnull List<ValueComputeTask> tasks) {
 		List<Future<Value>> results = this.pool.invokeAll(tasks);
 		List<Value> values = new ArrayList<>(results.size());
 
@@ -62,15 +63,12 @@ public class ForkJoinParallelExecutor implements ParallelExecutor {
 				values.add(result.get());
 				idx++;
 			} catch (InterruptedException e) {
-				throw new InterruptedParallelExecutionException(tasks.get(idx)
-						.getExpr(), e);
+				throw new InterruptedParallelExecutionException(tasks.get(idx).getExpr(), e);
 			} catch (ExecutionException e) {
 				if (e.getCause() instanceof RuntimeException) {
 					throw (RuntimeException) e.getCause();
 				} else {
-					throw new RuntimeException(
-							"Unexpected parallel task execution exception",
-							e.getCause());
+					throw new RuntimeException("Unexpected parallel task execution exception", e.getCause());
 				}
 			}
 		}

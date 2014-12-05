@@ -6,7 +6,9 @@ import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Operator;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class IncompatibleTypesException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -34,7 +36,7 @@ public class IncompatibleTypesException extends EvaluationException {
 		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN_1, rhs, operator.getSymbol()), operator, null, rhs);
 	}
 
-	public IncompatibleTypesException(Node node, String message, Operator<?> operator, ValueType lhs, ValueType rhs) {
+	private IncompatibleTypesException(Node node, String message, Operator<?> operator, ValueType lhs, ValueType rhs) {
 		super(node, message);
 		this.operator = operator;
 		this.lhs = lhs;

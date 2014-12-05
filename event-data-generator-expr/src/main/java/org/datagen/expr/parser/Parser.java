@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -23,7 +24,6 @@ import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.nodes.FieldRef;
 import org.datagen.expr.interpreter.InterpreterParameters;
 import org.datagen.factory.Config;
-import org.datagen.factory.ConfigBuilder;
 import org.datagen.generated.antlr.expression.ExpressionParserBaseListener;
 import org.datagen.generated.antlr.expression.ExpressionParserLexer;
 import org.datagen.generated.antlr.expression.ExpressionParserParser;
@@ -34,7 +34,7 @@ public class Parser {
 
 	private static class ExpressionParserListener extends ExpressionParserBaseListener implements ParserResult {
 
-		private Node root = null;
+		private Optional<Node> root = Optional.empty();
 		private final Collection<FieldRef> references = new ArrayList<>();
 
 		@Override
@@ -44,12 +44,12 @@ public class Parser {
 
 		@Override
 		public void exitStart(StartContext ctx) {
-			root = ctx.node;
+			root = Optional.of(ctx.node);
 		}
 
 		@Override
 		public Node getRoot() {
-			return root;
+			return root.get();
 		}
 
 		@Override
@@ -92,38 +92,39 @@ public class Parser {
 
 	}
 
-	public static ParserResult parse(String expression, EvalContext context, ClassLoader loader)
+	public static ParserResult parse(String expression, EvalContext context, Optional<ClassLoader> loader)
 			throws ParsingException {
-		return parse(new ANTLRInputStream(expression), null, context, loader);
+		return parse(new ANTLRInputStream(expression), Optional.<Config<InterpreterParameters>> empty(), context,
+				loader);
 	}
 
-	public static ParserResult parse(InputStream stream, EvalContext context, ClassLoader loader) throws IOException,
-			ParsingException {
-		return parse(new ANTLRInputStream(stream), null, context, loader);
+	public static ParserResult parse(InputStream stream, EvalContext context, Optional<ClassLoader> loader)
+			throws IOException, ParsingException {
+		return parse(new ANTLRInputStream(stream), Optional.<Config<InterpreterParameters>> empty(), context, loader);
 	}
 
-	public static ParserResult parse(Reader reader, EvalContext context, ClassLoader loader) throws IOException,
-			ParsingException {
-		return parse(new ANTLRInputStream(reader), null, context, loader);
+	public static ParserResult parse(Reader reader, EvalContext context, Optional<ClassLoader> loader)
+			throws IOException, ParsingException {
+		return parse(new ANTLRInputStream(reader), Optional.<Config<InterpreterParameters>> empty(), context, loader);
 	}
 
-	public static ParserResult parse(String expression, Config<InterpreterParameters> configuration,
-			EvalContext context, ClassLoader loader) throws ParsingException {
+	public static ParserResult parse(String expression, Optional<Config<InterpreterParameters>> configuration,
+			EvalContext context, Optional<ClassLoader> loader) throws ParsingException {
 		return parse(new ANTLRInputStream(expression), configuration, context, loader);
 	}
 
-	public static ParserResult parse(InputStream stream, Config<InterpreterParameters> configuration,
-			EvalContext context, ClassLoader loader) throws IOException, ParsingException {
+	public static ParserResult parse(InputStream stream, Optional<Config<InterpreterParameters>> configuration,
+			EvalContext context, Optional<ClassLoader> loader) throws IOException, ParsingException {
 		return parse(new ANTLRInputStream(stream), configuration, context, loader);
 	}
 
-	public static ParserResult parse(Reader reader, Config<InterpreterParameters> configuration, EvalContext context,
-			ClassLoader loader) throws IOException, ParsingException {
+	public static ParserResult parse(Reader reader, Optional<Config<InterpreterParameters>> configuration,
+			EvalContext context, Optional<ClassLoader> loader) throws IOException, ParsingException {
 		return parse(new ANTLRInputStream(reader), configuration, context, loader);
 	}
 
-	private static ParserResult parse(ANTLRInputStream stream, Config<InterpreterParameters> configuration,
-			EvalContext context, ClassLoader loader) throws ParsingException {
+	private static ParserResult parse(ANTLRInputStream stream, Optional<Config<InterpreterParameters>> configuration,
+			EvalContext context, Optional<ClassLoader> loader) throws ParsingException {
 		ExpressionParserLexer lexer = new ExpressionParserLexer(stream);
 
 		// Get a list of matched tokens
@@ -131,8 +132,7 @@ public class Parser {
 
 		// Pass the tokens to the parser
 		ExpressionParserParser parser = new ExpressionParserParser(tokens);
-		parser.setConfiguration(configuration != null ? configuration : new ConfigBuilder<InterpreterParameters>()
-				.build());
+		parser.setConfiguration(Config.ensure(configuration));
 		parser.setEvalContext(context);
 		parser.setJavaRefClassLoader(loader);
 

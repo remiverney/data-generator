@@ -12,7 +12,9 @@ import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.Mapped;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class JsonValueFormatContext implements ValueFormatContext {
 
 	private static final long serialVersionUID = 1L;
@@ -23,8 +25,7 @@ public class JsonValueFormatContext implements ValueFormatContext {
 		try {
 			DATATYPE_FACTORY = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
-			throw new RuntimeException(
-					"Failed to create instance of datatype factory", e);
+			throw new RuntimeException("Failed to create instance of datatype factory", e);
 		}
 	}
 
@@ -60,32 +61,25 @@ public class JsonValueFormatContext implements ValueFormatContext {
 
 	@Override
 	public String formatLambda(Lambda lambda) {
-		throw new UnsupportedOperationException(
-				"Cannot format a lambda function");
+		throw new UnsupportedOperationException("Cannot format a lambda function");
 	}
 
 	@Override
 	public String formatArray(Array array) {
-		return array.getAll().stream().sequential()
-				.map(x -> x.eval(null).toValueString(this))
+		return array.getAll().stream().sequential().map(x -> x.eval(null).toValueString(this))
 				.collect(Collectors.joining(", ", "[ ", " ]"));
 	}
 
 	@Override
 	public String formatMapped(Mapped mapped) {
-		return mapped
-				.getAll()
-				.entrySet()
-				.stream()
-				.sequential()
-				.map(x -> stringify(x.getKey().eval(null)) + " : "
-						+ x.getValue().eval(null).toValueString(this))
+		return mapped.getAll().entrySet().stream().sequential()
+				.map(x -> stringify(x.getKey().eval(null)) + " : " + x.getValue().eval(null).toValueString(this))
 				.collect(Collectors.joining(", ", "{ ", " }"));
 	}
 
 	private String stringify(Value value) {
-		return value.getType() == ValueType.STRING ? value.toValueString(this)
-				: "\"" + value.toValueString(this) + "\"";
+		return value.getType() == ValueType.STRING ? value.toValueString(this) : "\"" + value.toValueString(this)
+				+ "\"";
 	}
 
 }

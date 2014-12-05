@@ -1,11 +1,10 @@
 package org.datagen.utils;
 
 import java.io.Closeable;
-import java.util.Map;
 
-public interface EntityManager<T extends Closeable> extends Closeable {
+public interface EntityManager<I extends Comparable<I>, T extends Closeable> extends EntityRegistry<I, T> {
 
-	Map<String, T> getAll();
+	void register(I name, T entity);
 
-	T get(String name);
+	void unregister(I name);
 }

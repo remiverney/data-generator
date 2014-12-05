@@ -2,6 +2,7 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.context.EvalContext;
@@ -16,17 +17,19 @@ import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
 import org.datagen.expr.parser.Parser;
 import org.datagen.expr.parser.ParserResult;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Eval implements Node {
 
 	private final Node expr;
-	private final ClassLoader loader;
+	private final Optional<ClassLoader> loader;
 
 	public Eval(Node expr) {
-		this(expr, null);
+		this(expr, Optional.<ClassLoader> empty());
 	}
 
-	public Eval(Node expr, ClassLoader loader) {
+	public Eval(Node expr, Optional<ClassLoader> loader) {
 		this.expr = expr;
 		this.loader = loader;
 	}

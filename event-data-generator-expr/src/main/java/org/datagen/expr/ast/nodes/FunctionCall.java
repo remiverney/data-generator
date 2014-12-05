@@ -8,7 +8,9 @@ import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class FunctionCall implements Node {
 
 	private final String name;
@@ -34,16 +36,12 @@ public class FunctionCall implements Node {
 
 	@Override
 	public Value eval(EvalContext context) {
-		return context.getFunctionRegistry().invokeFunction(
-				this,
-				name,
-				parameters.stream().map(p -> p.eval(context))
-						.collect(Collectors.toCollection(ArrayList::new)));
+		return context.getFunctionRegistry().invokeFunction(this, name,
+				parameters.stream().map(p -> p.eval(context)).collect(Collectors.toCollection(ArrayList::new)));
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		builder.append(':').append(name);
 		builder.append('(');
 		context.formatList(builder, parameters, ',');
@@ -54,17 +52,11 @@ public class FunctionCall implements Node {
 
 	@Override
 	public Node optimize(EvalContext context) {
-		boolean deterministic = context.getFunctionRegistry().isDeterministic(
-				this, name);
+		boolean deterministic = context.getFunctionRegistry().isDeterministic(this, name);
 
-		if (deterministic
-				&& parameters.stream().allMatch(
-						p -> (p instanceof LiteralValue))) {
-			return context.getFunctionRegistry().invokeFunction(
-					this,
-					name,
-					parameters.stream().map(p -> p.eval(context))
-							.collect(Collectors.toCollection(ArrayList::new)));
+		if (deterministic && parameters.stream().allMatch(p -> (p instanceof LiteralValue))) {
+			return context.getFunctionRegistry().invokeFunction(this, name,
+					parameters.stream().map(p -> p.eval(context)).collect(Collectors.toCollection(ArrayList::new)));
 		} else {
 			return Node.super.optimize(context);
 		}

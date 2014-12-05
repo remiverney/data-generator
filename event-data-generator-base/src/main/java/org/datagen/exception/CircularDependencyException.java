@@ -16,20 +16,9 @@ public class CircularDependencyException extends Exception {
 		this.path = path;
 	}
 
-	public CircularDependencyException(String message) {
-		super(message);
-		this.path = null;
-	}
-
 	public CircularDependencyException(List<Object> path, Throwable cause) {
-		super(MessageFormat.format(EXCEPTION_MSG_PATTERN, formatPath(path)),
-				cause);
+		super(MessageFormat.format(EXCEPTION_MSG_PATTERN, formatPath(path)), cause);
 		this.path = path;
-	}
-
-	public CircularDependencyException(String message, Throwable cause) {
-		super(message, cause);
-		this.path = null;
 	}
 
 	public List<?> getPath() {
@@ -37,11 +26,10 @@ public class CircularDependencyException extends Exception {
 	}
 
 	private static String formatPath(List<?> path) {
-		return path.stream().sequential()
-				.reduce(new StringBuilder(), (t, u) -> {
-					return t.append(u).append("->");
-				}, (u, v) -> {
-					return u.append(v);
-				}).toString();
+		return path.stream().sequential().reduce(new StringBuilder(), (t, u) -> {
+			return t.append(u).append("->");
+		}, (u, v) -> {
+			return u.append(v);
+		}).toString();
 	}
 }

@@ -1,6 +1,7 @@
 package org.datagen.exception;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 public class UnresolvedDependencyException extends Exception {
 
@@ -9,11 +10,10 @@ public class UnresolvedDependencyException extends Exception {
 	private static final String EXCEPTION_MSG_PATTERN = "Unresolved dependency detected [ {0} ], referenced by [ {1} ]";
 
 	private final String dependency;
-	private final String dependent;
+	private final Optional<String> dependent;
 
-	public UnresolvedDependencyException(String dependency, String dependent) {
-		super(MessageFormat
-				.format(EXCEPTION_MSG_PATTERN, dependency, dependent));
+	public UnresolvedDependencyException(String dependency, Optional<String> dependent) {
+		super(MessageFormat.format(EXCEPTION_MSG_PATTERN, dependency, dependent));
 		this.dependency = dependency;
 		this.dependent = dependent;
 	}
@@ -22,7 +22,7 @@ public class UnresolvedDependencyException extends Exception {
 		return dependency;
 	}
 
-	public String getDependent() {
+	public Optional<String> getDependent() {
 		return dependent;
 	}
 }

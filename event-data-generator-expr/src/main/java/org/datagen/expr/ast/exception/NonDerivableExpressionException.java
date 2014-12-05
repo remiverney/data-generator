@@ -3,7 +3,9 @@ package org.datagen.expr.ast.exception;
 import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class NonDerivableExpressionException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -14,7 +16,7 @@ public class NonDerivableExpressionException extends EvaluationException {
 		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, node.getClass().getName()));
 	}
 
-	public NonDerivableExpressionException(Node node, String message) {
+	private NonDerivableExpressionException(Node node, String message) {
 		super(node, message);
 	}
 }

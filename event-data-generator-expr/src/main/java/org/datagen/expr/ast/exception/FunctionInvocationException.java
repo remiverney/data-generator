@@ -3,7 +3,9 @@ package org.datagen.expr.ast.exception;
 import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class FunctionInvocationException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -16,7 +18,7 @@ public class FunctionInvocationException extends EvaluationException {
 		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, reference), reference, cause);
 	}
 
-	public FunctionInvocationException(Node node, String message, String reference, Throwable cause) {
+	private FunctionInvocationException(Node node, String message, String reference, Throwable cause) {
 		super(node, message, cause);
 		this.reference = reference;
 	}

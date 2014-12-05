@@ -1,5 +1,8 @@
 package org.datagen.core.scheduler;
 
+import org.datagen.utils.annotation.Immutable;
+
+@Immutable
 public class TaskException extends Exception {
 
 	private static final long serialVersionUID = 1L;
@@ -12,8 +15,7 @@ public class TaskException extends Exception {
 		super(message, cause);
 	}
 
-	public TaskException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
+	public TaskException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 

@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.datagen.expr.ast.Array;
@@ -18,29 +19,35 @@ import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.functions.MethodHelpers;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class JavaRef implements Node {
 
 	private final Class<?> clazz;
 	private final String methodName;
 	private final String reference;
 	private final MethodHandle handle;
-	private final List<Node> parameters;
-	private final ClassLoader loader;
+	private final Optional<List<Node>> parameters;
+	private final Optional<ClassLoader> loader;
 
 	public JavaRef(List<String> fqn) {
-		this(fqn, (ClassLoader) null);
+		this(fqn, Optional.<ClassLoader> empty());
 	}
 
 	public JavaRef(List<String> fqn, ClassLoader loader) {
-		this(fqn, null, null);
+		this(fqn, Optional.<ClassLoader> of(loader));
+	}
+
+	public JavaRef(List<String> fqn, Optional<ClassLoader> loader) {
+		this(fqn, Optional.<List<Node>> empty(), loader);
 	}
 
 	public JavaRef(List<String> fqn, List<Node> parameters) {
-		this(fqn, parameters, null);
+		this(fqn, Optional.<List<Node>> of(parameters), Optional.<ClassLoader> empty());
 	}
 
-	public JavaRef(List<String> fqn, List<Node> parameters, ClassLoader loader) {
+	public JavaRef(List<String> fqn, Optional<List<Node>> parameters, Optional<ClassLoader> loader) {
 		this.loader = loader;
 		this.methodName = fqn.remove(fqn.size() - 1);
 		this.clazz = findClass(fqn);
@@ -50,18 +57,22 @@ public class JavaRef implements Node {
 	}
 
 	public JavaRef(String fqn) {
-		this(fqn, (ClassLoader) null);
+		this(fqn, Optional.<ClassLoader> empty());
 	}
 
 	public JavaRef(String fqn, ClassLoader loader) {
-		this(fqn, null, loader);
+		this(fqn, Optional.<ClassLoader> of(loader));
+	}
+
+	public JavaRef(String fqn, Optional<ClassLoader> loader) {
+		this(fqn, Optional.empty(), loader);
 	}
 
 	public JavaRef(String fqn, List<Node> parameters) {
-		this(fqn, parameters, null);
+		this(fqn, Optional.<List<Node>> of(parameters), Optional.<ClassLoader> empty());
 	}
 
-	public JavaRef(String fqn, List<Node> parameters, ClassLoader loader) {
+	public JavaRef(String fqn, Optional<List<Node>> parameters, Optional<ClassLoader> loader) {
 		this.loader = loader;
 		int pos = fqn.lastIndexOf('.');
 
@@ -77,7 +88,7 @@ public class JavaRef implements Node {
 	}
 
 	private boolean isMethodRef() {
-		return parameters != null;
+		return parameters.isPresent();
 	}
 
 	private Class<?> findClass(List<String> fqn) {
@@ -86,7 +97,8 @@ public class JavaRef implements Node {
 
 	private Class<?> findClass(String className) {
 		try {
-			return (this.loader == null) ? Class.forName(className) : Class.forName(className, true, this.loader);
+			return (!this.loader.isPresent()) ? Class.forName(className) : Class.forName(className, true,
+					this.loader.get());
 		} catch (ClassNotFoundException e) {
 			throw new UnresolvedReferenceException(this, className);
 		}
@@ -96,7 +108,7 @@ public class JavaRef implements Node {
 		if (isMethodRef()) {
 			Method methods[] = clazz.getDeclaredMethods();
 
-			Method vararg = null;
+			Optional<Method> vararg = Optional.empty();
 
 			for (Method method : methods) {
 				if (!method.getName().equals(methodName)) {
@@ -110,10 +122,10 @@ public class JavaRef implements Node {
 					continue;
 				}
 
-				if ((method.getParameterCount() - 1 <= parameters.size()) && (method.isVarArgs())) {
-					vararg = method;
+				if ((method.getParameterCount() - 1 <= parameters.get().size()) && (method.isVarArgs())) {
+					vararg = Optional.of(method);
 					continue;
-				} else if (method.getParameterCount() != parameters.size()) {
+				} else if (method.getParameterCount() != parameters.get().size()) {
 					continue;
 				}
 
@@ -124,9 +136,9 @@ public class JavaRef implements Node {
 				}
 			}
 
-			if (vararg != null) {
+			if (vararg.isPresent()) {
 				try {
-					return MethodHandles.publicLookup().unreflect(vararg);
+					return MethodHandles.publicLookup().unreflect(vararg.get());
 				} catch (IllegalAccessException e) {
 				}
 			}
@@ -144,7 +156,7 @@ public class JavaRef implements Node {
 
 	@Override
 	public List<Node> getChildren() {
-		return isMethodRef() ? parameters : Node.super.getChildren();
+		return isMethodRef() ? parameters.get() : Node.super.getChildren();
 	}
 
 	@Override
@@ -155,7 +167,7 @@ public class JavaRef implements Node {
 	private Value evalMethod(EvalContext context) {
 		assert isMethodRef() : "unexpected call in case of field reference";
 
-		List<Object> args = parameters.stream().sequential().map(p -> getLiteral(p.eval(context), 0))
+		List<Object> args = parameters.get().stream().sequential().map(p -> getLiteral(p.eval(context), 0))
 				.collect(Collectors.toList());
 
 		try {
@@ -197,9 +209,9 @@ public class JavaRef implements Node {
 		builder.append("java:");
 		builder.append(reference);
 
-		if (parameters != null) {
+		if (parameters.isPresent()) {
 			builder.append('(');
-			context.formatList(builder, parameters, ',');
+			context.formatList(builder, parameters.get(), ',');
 			builder.append(')');
 		}
 

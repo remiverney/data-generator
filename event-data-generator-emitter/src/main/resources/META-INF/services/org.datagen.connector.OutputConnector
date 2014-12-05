@@ -1,1 +1,2 @@
-org.datagen.connector.csv.CsvOutputConnectorImpl
+#org.datagen.connector.csv.io.CsvOutputConnectorImpl
+org.datagen.connector.csv.nio.CsvOutputConnectorImpl

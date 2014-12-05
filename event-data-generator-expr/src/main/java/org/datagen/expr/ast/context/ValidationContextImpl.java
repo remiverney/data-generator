@@ -4,12 +4,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.datagen.expr.ast.exception.EvaluationException;
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ValidationContextImpl implements ValidationContext {
 
 	private static class StatusImpl implements Status {
@@ -91,11 +94,11 @@ public class ValidationContextImpl implements ValidationContext {
 	}
 
 	@Override
-	public Collection<Status> getStatuses(StatusLevel min, boolean sorted) {
+	public Collection<Status> getStatuses(Optional<StatusLevel> min, boolean sorted) {
 		Stream<Status> filtered = this.statuses.stream();
 
-		if (min != null) {
-			filtered = filtered.filter(s -> (s.getLevel().compareTo(min) <= 0));
+		if (min.isPresent()) {
+			filtered = filtered.filter(s -> (s.getLevel().compareTo(min.get()) <= 0));
 		}
 
 		return (sorted ? filtered.sorted() : filtered).collect(Collectors.toCollection(ArrayList::new));

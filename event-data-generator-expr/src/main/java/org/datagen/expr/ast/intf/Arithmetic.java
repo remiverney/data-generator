@@ -9,11 +9,11 @@ public enum Arithmetic implements Operator<Arithmetic> {
 	MUL("*", Precedence.MUL, ValueOperation::mul, DerivationOperation::mul),
 	DIV("/", Precedence.MUL, ValueOperation::div, DerivationOperation::div),
 	MOD("%", Precedence.MUL, ValueOperation::mod, DerivationOperation::nonDerivable),
-	NEG("-", Precedence.NEG, null, DerivationOperation::neg),
+	NEG("-", Precedence.NEG, DerivationOperation::neg),
 	POW("^", Precedence.POW, ValueOperation::pow, DerivationOperation::pow),
 	SHL("<<", Precedence.SHIFT, ValueOperation::shl, DerivationOperation::nonDerivable),
 	SHR(">>", Precedence.SHIFT, ValueOperation::shr, DerivationOperation::nonDerivable),
-	FACT("!", Precedence.FACT, null, DerivationOperation::nonDerivable);
+	FACT("!", Precedence.FACT, DerivationOperation::nonDerivable);
 
 	private final String symbol;
 	private final Precedence precedence;
@@ -26,6 +26,10 @@ public enum Arithmetic implements Operator<Arithmetic> {
 		this.symbol = symbol;
 		this.precedence = precedence;
 		this.derivation = derivation;
+	}
+
+	private Arithmetic(String symbol, Precedence precedence, DerivationOperation.Evaluator derivation) {
+		this(symbol, precedence, null, derivation);
 	}
 
 	@Override

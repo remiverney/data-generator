@@ -1,5 +1,7 @@
 package org.datagen.expr.ast;
 
+import java.text.MessageFormat;
+import java.util.NoSuchElementException;
 import java.util.function.UnaryOperator;
 
 import org.datagen.expr.ast.intf.ValueType;
@@ -9,6 +11,8 @@ public final class CastMatrix {
 
 	private interface CastOperator extends UnaryOperator<LiteralValue> {
 	};
+
+	private static final String NO_VALID_CAST_MESSAGE_PATTERN = "No suitable cast from [ {0} ] to [ {1} ]";
 
 	private static final CastOperator IDENTITY = x -> x;
 
@@ -22,7 +26,7 @@ public final class CastMatrix {
 	private CastMatrix() {
 	}
 
-	public static Object cast(Object from, Class<?> to) {
+	public static Object cast(Object from, Class<?> to) throws NoSuchElementException {
 		if (from.getClass() == Double.class) {
 			if (to == Double.class || to == Float.class) {
 				return from;
@@ -49,19 +53,22 @@ public final class CastMatrix {
 			}
 		}
 
-		return null;
+		throw new NoSuchElementException(MessageFormat.format(NO_VALID_CAST_MESSAGE_PATTERN, from.getClass()
+				.getSimpleName(), to.getSimpleName()));
 	}
 
 	public static LiteralValue cast(LiteralValue from, ValueType to) {
 		try {
 			CastOperator cast = MATRIX[from.getType().ordinal()][to.ordinal()];
 			if (cast == null) {
-				return null;
+				throw new NoSuchElementException(MessageFormat.format(NO_VALID_CAST_MESSAGE_PATTERN, from.getClass()
+						.getSimpleName(), to.getTypeName()));
 			}
 
 			return cast.apply(from);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
+			throw new NoSuchElementException(MessageFormat.format(NO_VALID_CAST_MESSAGE_PATTERN, from.getClass()
+					.getSimpleName(), to.getTypeName()));
 		}
 	}
 }

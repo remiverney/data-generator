@@ -2,6 +2,7 @@ package org.datagen.expr.ast.context;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.datagen.expr.ast.exception.EvaluationException;
 import org.datagen.expr.ast.intf.Node;
@@ -32,7 +33,7 @@ public interface ValidationResult extends Serializable {
 
 	Collection<Status> getStatuses();
 
-	Collection<Status> getStatuses(StatusLevel min, boolean sorted);
+	Collection<Status> getStatuses(Optional<StatusLevel> min, boolean sorted);
 
 	boolean isValid(StatusLevel max);
 

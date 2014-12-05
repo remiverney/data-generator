@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,7 +27,9 @@ import org.datagen.expr.ast.nodes.LiteralValue;
 import org.datagen.utils.EmptyFunction;
 import org.datagen.utils.TriFunction;
 import org.datagen.utils.VarArgFunction;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class FunctionRegistryImpl implements FunctionRegistry {
 
 	public interface ParameterBridge {
@@ -39,6 +42,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		boolean isDeterministic();
 	}
 
+	@Immutable
 	public static abstract class BaseCallBridge implements CallBridge {
 
 		private final boolean deterministic;
@@ -53,6 +57,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
+	@Immutable
 	public static class EmptyFunctionCallBridge<R> extends BaseCallBridge {
 
 		private final EmptyFunction<R> function;
@@ -72,6 +77,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
+	@Immutable
 	public static class FunctionCallBridge<T, R> extends BaseCallBridge {
 
 		private final Function<T, R> function;
@@ -93,6 +99,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
+	@Immutable
 	public static class BiFunctionCallBridge<T, U, R> extends BaseCallBridge {
 
 		private final BiFunction<T, U, R> function;
@@ -118,6 +125,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
+	@Immutable
 	public static class TriFunctionCallBridge<T, U, V, R> extends BaseCallBridge {
 
 		private final TriFunction<T, U, V, R> function;
@@ -145,6 +153,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
+	@Immutable
 	public static class VarArgFunctionCallBridge<T, R> extends BaseCallBridge {
 
 		private final VarArgFunction<T, R> function;
@@ -172,7 +181,7 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 		}
 	}
 
-	private final Class<?> FUNCTION_CLASSES[] = new Class<?>[] { MathFunctions.class, StringFunctions.class };
+	private static final Class<?> FUNCTION_CLASSES[] = new Class<?>[] { MathFunctions.class, StringFunctions.class };
 
 	private final Map<String, CallBridge> functions = new HashMap<>();
 
@@ -343,9 +352,10 @@ public class FunctionRegistryImpl implements FunctionRegistry {
 
 		Object result = literal.get();
 		if (!clazz.isInstance(result)) {
-			result = CastMatrix.cast(result, clazz);
-			if (result == null) {
-				throw new IncompatibleArgumentException(node, parameter, value.getType());
+			try {
+				result = CastMatrix.cast(result, clazz);
+			} catch (NoSuchElementException e) {
+				throw new IncompatibleArgumentException(node, parameter, value.getType(), e);
 			}
 		}
 

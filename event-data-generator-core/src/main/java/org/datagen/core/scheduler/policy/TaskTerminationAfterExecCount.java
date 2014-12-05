@@ -1,7 +1,7 @@
 package org.datagen.core.scheduler.policy;
 
 public class TaskTerminationAfterExecCount implements TaskTerminationPolicy {
-	
+
 	private long remaining;
 
 	public TaskTerminationAfterExecCount(long count) {
@@ -11,7 +11,7 @@ public class TaskTerminationAfterExecCount implements TaskTerminationPolicy {
 	@Override
 	public boolean finished() {
 		remaining--;
-		return remaining > 0;
+		return remaining <= 0;
 	}
 
 }

@@ -4,7 +4,9 @@ import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class NotAnArrayException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -17,7 +19,7 @@ public class NotAnArrayException extends EvaluationException {
 		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, type), type);
 	}
 
-	public NotAnArrayException(Node node, String message, ValueType type) {
+	private NotAnArrayException(Node node, String message, ValueType type) {
 		super(node, message);
 		this.type = type;
 	}

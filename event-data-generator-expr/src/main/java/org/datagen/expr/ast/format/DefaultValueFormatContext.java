@@ -5,18 +5,19 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.datagen.utils.annotation.Immutable;
+
+@Immutable
 public class DefaultValueFormatContext extends SimpleValueFormatContext {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Locale DEFAULT_LOCALE = Locale.US;
 
-	private static final DateFormat DEFAULT_DATE_FORMAT = DateFormat
-			.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM,
-					DEFAULT_LOCALE);
+	private static final DateFormat DEFAULT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
+			DateFormat.MEDIUM, DEFAULT_LOCALE);
 
-	private static final NumberFormat DEFAULT_NUMBER_FORMAT = NumberFormat
-			.getNumberInstance(DEFAULT_LOCALE);
+	private static final NumberFormat DEFAULT_NUMBER_FORMAT = NumberFormat.getNumberInstance(DEFAULT_LOCALE);
 
 	private final DateFormat dateFormat;
 	private final NumberFormat numberFormat;
@@ -25,8 +26,7 @@ public class DefaultValueFormatContext extends SimpleValueFormatContext {
 		this(DEFAULT_DATE_FORMAT, DEFAULT_NUMBER_FORMAT);
 	}
 
-	public DefaultValueFormatContext(DateFormat dateFormat,
-			NumberFormat numberFormat) {
+	public DefaultValueFormatContext(DateFormat dateFormat, NumberFormat numberFormat) {
 		this.dateFormat = dateFormat;
 		this.numberFormat = numberFormat;
 	}

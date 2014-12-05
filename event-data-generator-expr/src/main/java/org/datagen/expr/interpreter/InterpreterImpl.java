@@ -9,8 +9,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import javax.management.AttributeNotFoundException;
+import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
+import javax.management.openmbean.SimpleType;
 
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
@@ -29,10 +35,12 @@ import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ForkJoinParallelExecutor;
 import org.datagen.expr.ast.parallel.ParallelExecutor;
+import org.datagen.expr.interpreter.mbean.MBeanValueHelper;
 import org.datagen.expr.parser.Parser;
 import org.datagen.expr.parser.ParserResult;
 import org.datagen.factory.Config;
 import org.datagen.factory.ConfigBuilder;
+import org.datagen.mbean.MBeanAttributeHelper;
 import org.datagen.utils.DependencyOrder;
 import org.datagen.utils.EmptyFunction;
 import org.datagen.utils.MergeCollectors;
@@ -74,34 +82,39 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 	private static final String COLUMN_NOT_FOUND_MSG = "Unknown colomn '{0}";
 	private static final String COLUMN_ALREADY_EXISTS_MSG = "Column '{0}' is already defined";
 
+	private final String name;
 	private final Map<String, ParserResult> expressions = new HashMap<>();
 	private final List<String> sorted = new ArrayList<>();
 	private final DateProvider dateProvider;
-	private final ParallelExecutor parallelExecutor;
+	private final Optional<ParallelExecutor> parallelExecutor;
 	private final ValueFormatContext formatContext;
 	private final EvalContext context;
-	private Config<InterpreterParameters> configuration;
-	private ClassLoader refClassLoader = null;
+	private Optional<Config<InterpreterParameters>> configuration;
+	private Optional<ClassLoader> refClassLoader = Optional.<ClassLoader> empty();
 
-	public InterpreterImpl() {
-		this(new ConfigBuilder<InterpreterParameters>().build());
+	public InterpreterImpl(String name) {
+		this(name, Optional.of(new ConfigBuilder<InterpreterParameters>().build()));
 	}
 
-	public InterpreterImpl(Config<InterpreterParameters> configuration) {
-		this(configuration, new SystemDateProvider(), new DefaultValueFormatContext());
+	public InterpreterImpl(String name, Optional<Config<InterpreterParameters>> configuration) {
+		this(name, configuration, new SystemDateProvider(), new DefaultValueFormatContext());
 	}
 
-	public InterpreterImpl(Config<InterpreterParameters> configuration, DateProvider dateProvider,
-			ValueFormatContext formatContext) {
+	public InterpreterImpl(String name, Optional<Config<InterpreterParameters>> configuration,
+			DateProvider dateProvider, ValueFormatContext formatContext) {
+		this.name = name;
 		this.dateProvider = dateProvider;
 		this.formatContext = formatContext;
 		this.configuration = configuration;
 
-		this.parallelExecutor = configuration.isEnabled(InterpreterParameters.ENABLE_PARALLEL) ? new ForkJoinParallelExecutor()
-				: null;
+		boolean parallel = configuration.isPresent() ? configuration.get().isEnabled(
+				InterpreterParameters.ENABLE_PARALLEL) : (Boolean) InterpreterParameters.ENABLE_PARALLEL
+				.getDefaultValue().get();
 
-		this.context = new EvalContextImpl(this.dateProvider, this.formatContext,
-				configuration.isEnabled(InterpreterParameters.ENABLE_PARALLEL), this.parallelExecutor, this);
+		this.parallelExecutor = parallel ? Optional.of(new ForkJoinParallelExecutor()) : Optional
+				.<ParallelExecutor> empty();
+
+		this.context = new EvalContextImpl(this.dateProvider, this.formatContext, parallel, this.parallelExecutor, this);
 	}
 
 	@Override
@@ -313,12 +326,12 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 	}
 
 	@Override
-	public void setConfiguration(Config<InterpreterParameters> configuration) {
+	public void setConfiguration(Optional<Config<InterpreterParameters>> configuration) {
 		this.configuration = configuration;
 	}
 
 	@Override
-	public Config<InterpreterParameters> getConfiguration() {
+	public Optional<Config<InterpreterParameters>> getConfiguration() {
 		return this.configuration;
 	}
 
@@ -339,12 +352,63 @@ public class InterpreterImpl extends ObservableBase<Interpreter, InterpreterEven
 
 	@Override
 	public void setJavaRefClassLoader(ClassLoader loader) {
-		this.refClassLoader = loader;
+		this.refClassLoader = Optional.of(loader);
 	}
 
 	@Override
-	public ClassLoader getJavaRefClassLoader() {
+	public Optional<ClassLoader> getJavaRefClassLoader() {
 		return this.refClassLoader;
 	}
 
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public String getObjectInstanceName() {
+		return getName();
+	}
+
+	@Override
+	public OpenMBeanAttributeInfoSupport[] getAttributeInfo() {
+		return new OpenMBeanAttributeInfoSupport[] {
+				new OpenMBeanAttributeInfoSupport("time", "Interpreter current time", SimpleType.DATE, true, false,
+						false),
+				new OpenMBeanAttributeInfoSupport("sequence", "Sequence number", SimpleType.LONG, true, false, false),
+
+				new OpenMBeanAttributeInfoSupport("properties", "Interpreter properties",
+						MBeanAttributeHelper.TABLE_TYPE, true, false, false),
+				new OpenMBeanAttributeInfoSupport("fields", "Latest field values", MBeanAttributeHelper.TABLE_TYPE,
+						true, false, false),
+				new OpenMBeanAttributeInfoSupport(ATTR_CONFIGURATION, "Interpreter configuration settings",
+						MBeanAttributeHelper.TABLE_TYPE, true, false, false) };
+	}
+
+	@Override
+	public Object getAttribute(String name) throws AttributeNotFoundException {
+		Supplier<?> supplier;
+
+		switch (name) {
+		case "time":
+			supplier = () -> context.getTime();
+			break;
+		case "sequence":
+			supplier = () -> context.getSequence();
+			break;
+		case "properties":
+			supplier = () -> MBeanValueHelper.buildValueTableData(context.getProperties(), formatContext);
+			break;
+		case "fields":
+			supplier = () -> MBeanValueHelper.buildValueTableData(context.getFields(), formatContext);
+			break;
+		case ATTR_CONFIGURATION:
+			supplier = () -> MBeanAttributeHelper.buildConfigurationData(InterpreterImpl.this);
+			break;
+		default:
+			throw new AttributeNotFoundException(name);
+		}
+
+		return supplier.get();
+	}
 }

@@ -4,7 +4,9 @@ import java.text.MessageFormat;
 
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class IncompatibleAttributeException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
@@ -14,15 +16,11 @@ public class IncompatibleAttributeException extends EvaluationException {
 	private final ValueType type;
 	private final String attribute;
 
-	public IncompatibleAttributeException(Node node, ValueType type,
-			String attribute) {
-		this(node,
-				MessageFormat.format(EXCEPTION_MSG_PATTERN, attribute, type),
-				attribute, type);
+	public IncompatibleAttributeException(Node node, ValueType type, String attribute) {
+		this(node, MessageFormat.format(EXCEPTION_MSG_PATTERN, attribute, type), attribute, type);
 	}
 
-	public IncompatibleAttributeException(Node node, String message,
-			String attribute, ValueType type) {
+	private IncompatibleAttributeException(Node node, String message, String attribute, ValueType type) {
 		super(node, message);
 		this.attribute = attribute;
 		this.type = type;

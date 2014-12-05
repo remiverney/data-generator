@@ -2,6 +2,7 @@ package org.datagen.expr.ast.context;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 import org.datagen.expr.DateProvider;
 import org.datagen.expr.ast.Library;
@@ -29,11 +30,15 @@ public interface EvalContext {
 
 	void unsetProperty(String property);
 
+	Map<String, Value> getProperties();
+
 	Value getField(String field);
 
 	Value setField(String field, Value value);
 
 	Value unsetField(String field);
+
+	Map<String, Value> getFields();
 
 	Value getVariable(String variable);
 
@@ -69,7 +74,7 @@ public interface EvalContext {
 
 	boolean isParallelizable();
 
-	ParallelExecutor getParallelExecutor();
+	Optional<ParallelExecutor> getParallelExecutor();
 
 	Interpreter getInterpreter();
 }

@@ -6,7 +6,9 @@ import org.datagen.expr.ast.intf.Logic;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Not extends UnaryOp<Logic> {
 
 	public Not(Node rhs) {

@@ -2,6 +2,7 @@ package org.datagen.expr.ast.nodes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.datagen.expr.ast.Keywords;
 import org.datagen.expr.ast.ValueOperation;
@@ -10,28 +11,34 @@ import org.datagen.expr.ast.exception.NoMatchingCaseException;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Case implements Node {
 
-	private final Node expr;
+	private final Optional<Node> expr;
 	private final List<CaseWhen> cases;
-	private final Node otherwise;
+	private final Optional<Node> otherwise;
 
 	public Case(List<CaseWhen> cases) {
-		this(null, cases, null);
+		this(Optional.empty(), cases, Optional.empty());
 	}
 
 	public Case(Node expr, List<CaseWhen> cases) {
-		this(expr, cases, null);
+		this(Optional.of(expr), cases, Optional.empty());
 	}
 
 	public Case(Node expr, List<CaseWhen> cases, Node otherwise) {
+		this(Optional.of(expr), cases, Optional.of(otherwise));
+	}
+
+	private Case(Optional<Node> expr, List<CaseWhen> cases, Optional<Node> otherwise) {
 		this.expr = expr;
 		this.cases = cases;
 		this.otherwise = otherwise;
 	}
 
-	public Node getExpr() {
+	public Optional<Node> getExpr() {
 		return expr;
 	}
 
@@ -39,7 +46,7 @@ public class Case implements Node {
 		return cases;
 	}
 
-	public Node getOtherwise() {
+	public Optional<Node> getOtherwise() {
 		return otherwise;
 	}
 
@@ -47,32 +54,26 @@ public class Case implements Node {
 	public List<Node> getChildren() {
 		List<Node> children = new ArrayList<>();
 
-		if (expr != null) {
-			children.add(expr);
-		}
-
+		expr.ifPresent(x -> children.add(x));
 		children.addAll(cases);
-		if (otherwise != null) {
-			children.add(otherwise);
-		}
+		otherwise.ifPresent(x -> children.add(x));
 
 		return children;
 	}
 
 	@Override
 	public Value eval(EvalContext context) {
-		if (expr != null) {
-			Value test = expr.eval(context);
+		if (expr.isPresent()) {
+			Value test = expr.get().eval(context);
 			for (CaseWhen caze : cases) {
 				Value value = caze.getWhen().eval(context);
-				if (ValueOperation.evalBoolean(context, this,
-						ValueOperation.equal(context, this, test, value))) {
+				if (ValueOperation.evalBoolean(context, this, ValueOperation.equal(context, this, test, value))) {
 					return caze.getThen().eval(context);
 				}
 			}
 
-			if (otherwise != null) {
-				return otherwise.eval(context);
+			if (otherwise.isPresent()) {
+				return otherwise.get().eval(context);
 			} else {
 				throw new NoMatchingCaseException(this, test);
 			}
@@ -84,8 +85,8 @@ public class Case implements Node {
 				}
 			}
 
-			if (otherwise != null) {
-				return otherwise.eval(context);
+			if (otherwise.isPresent()) {
+				return otherwise.get().eval(context);
 			} else {
 				throw new NoMatchingCaseException(this);
 			}
@@ -93,14 +94,13 @@ public class Case implements Node {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		context.newline(builder);
 		context.formatKeyword(builder, Keywords.CASE);
 
-		if (expr != null) {
+		if (expr.isPresent()) {
 			context.spacing(builder);
-			expr.toString(builder, context);
+			expr.get().toString(builder, context);
 		}
 
 		context.nest();
@@ -110,11 +110,11 @@ public class Case implements Node {
 			caze.toString(builder, context);
 		}
 
-		if (otherwise != null) {
+		if (otherwise.isPresent()) {
 			context.newline(builder);
 			context.formatKeyword(builder, Keywords.ELSE);
 			context.spacing(builder);
-			otherwise.toString(builder, context);
+			otherwise.get().toString(builder, context);
 		}
 
 		context.unnest();

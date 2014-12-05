@@ -19,7 +19,9 @@ import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class LambdaDef implements Value, Lambda {
 
 	private final List<String> parameters;
@@ -153,8 +155,8 @@ public class LambdaDef implements Value, Lambda {
 	}
 
 	@Override
-	public LambdaDef getDerivative(String variable) {
-		Node derivative = body.derivative(new DerivationContextimpl(variable));
+	public LambdaDef getDerivative(String variable, EvalContext context) {
+		Node derivative = body.derivative(new DerivationContextimpl(variable, context));
 
 		return new LambdaDef(parameters, derivative);
 	}

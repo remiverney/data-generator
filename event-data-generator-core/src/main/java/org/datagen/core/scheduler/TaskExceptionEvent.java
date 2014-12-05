@@ -1,7 +1,9 @@
 package org.datagen.core.scheduler;
 
-public class TaskExceptionEvent<T extends SchedulerTask> implements
-		SchedulerEvent {
+import org.datagen.utils.annotation.Immutable;
+
+@Immutable
+public class TaskExceptionEvent<T extends SchedulerTask> implements SchedulerEvent {
 
 	private static final long serialVersionUID = 1L;
 

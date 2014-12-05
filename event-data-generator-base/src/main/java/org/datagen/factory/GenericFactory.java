@@ -1,12 +1,24 @@
 package org.datagen.factory;
 
-public interface GenericFactory<T, P extends BuilderParameter<?>> {
+import java.io.Serializable;
+import java.util.Optional;
 
-	default T get() {
-		return get(null);
+import javax.annotation.Nonnull;
+
+import org.datagen.utils.Identifiable;
+
+public interface GenericFactory<I extends Serializable & Comparable<I>, T extends Identifiable<I>, P extends BuilderParameter<?>> {
+
+	default @Nonnull T get() {
+		return get(Optional.<Config<P>> empty());
 	}
 
-	T get(Config<P> config);
+	@Nonnull
+	T get(Optional<Config<P>> config);
 
+	@Nonnull
+	T get(I name, Optional<Config<P>> config);
+
+	@Nonnull
 	ConfigBuilder<P> getConfigBuilder();
 }

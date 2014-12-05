@@ -14,7 +14,9 @@ import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ArrayDef implements Value, Array {
 
 	private final List<Node> items;
@@ -36,11 +38,6 @@ public class ArrayDef implements Value, Array {
 	@Override
 	public boolean isArray() {
 		return true;
-	}
-
-	@Override
-	public String getName() {
-		return null;
 	}
 
 	@Override
@@ -95,8 +92,7 @@ public class ArrayDef implements Value, Array {
 
 	@Override
 	public ArrayDef eval(EvalContext context) {
-		return new ArrayDef(items.stream().map(i -> i.eval(context))
-				.collect(Collectors.toCollection(ArrayList::new)));
+		return new ArrayDef(items.stream().map(i -> i.eval(context)).collect(Collectors.toCollection(ArrayList::new)));
 	}
 
 	@Override
@@ -105,8 +101,7 @@ public class ArrayDef implements Value, Array {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		builder.append('{');
 		context.spacing(builder);
 

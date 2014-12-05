@@ -15,7 +15,9 @@ import org.datagen.expr.ast.format.ValueFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class MappedDef implements Value, Mapped {
 
 	private final Map<Node, Node> items;
@@ -47,19 +49,13 @@ public class MappedDef implements Value, Mapped {
 	}
 
 	@Override
-	public String getName() {
-		return null;
-	}
-
-	@Override
 	public int getSize() {
 		return items.size();
 	}
 
 	@Override
 	public Node get(Value key) {
-		throw new UnsupportedOperationException(
-				"Attempted to get a field from an associative map not evaluated before");
+		throw new UnsupportedOperationException("Attempted to get a field from an associative map not evaluated before");
 	}
 
 	@Override
@@ -84,18 +80,13 @@ public class MappedDef implements Value, Mapped {
 
 	@Override
 	public MappedDef eval(EvalContext context) {
-		return new MappedDef(items
-				.entrySet()
-				.stream()
-				.collect(
-						Collectors.toMap(x -> x.getKey().eval(context), x -> x
-								.getValue().eval(context)))) {
+		return new MappedDef(items.entrySet().stream()
+				.collect(Collectors.toMap(x -> x.getKey().eval(context), x -> x.getValue().eval(context)))) {
 			@Override
 			public Node get(Value key) {
 				Node value = MappedDef.this.items.get(key);
 				if (value == null) {
-					throw new UnknownFieldException(MappedDef.this,
-							key.toString());
+					throw new UnknownFieldException(MappedDef.this, key.toString());
 				}
 
 				return value.eval(context);
@@ -109,8 +100,7 @@ public class MappedDef implements Value, Mapped {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		builder.append('{');
 		context.spacing(builder);
 
@@ -118,8 +108,7 @@ public class MappedDef implements Value, Mapped {
 				builder,
 				items.entrySet(),
 				',',
-				x -> builder.append(x.getKey().toString(builder, context)
-						.append(" => ")
+				x -> builder.append(x.getKey().toString(builder, context).append(" => ")
 						.append(x.getValue().toString(builder, context))));
 
 		context.spacing(builder);

@@ -1,6 +1,7 @@
 package org.datagen.core.scheduler.impl;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datagen.core.scheduler.Scheduler;
@@ -11,10 +12,11 @@ import org.datagen.core.scheduler.policy.TaskTerminationPolicy;
 import org.datagen.utils.Observable;
 import org.datagen.utils.ObservableBase;
 import org.datagen.utils.Observer;
+import org.datagen.utils.annotation.Immutable;
 
-public class TaskSchedulerImpl<T extends SchedulerTask> extends
-		ObservableBase<Scheduler<T>, SchedulerEvent> implements Scheduler<T>,
-		Observer<TaskThread<SchedulerTask>, SchedulerEvent> {
+@Immutable
+public class TaskSchedulerImpl<T extends SchedulerTask> extends ObservableBase<Scheduler<T>, SchedulerEvent> implements
+		Scheduler<T>, Observer<TaskThread<SchedulerTask>, SchedulerEvent> {
 
 	private final Map<SchedulerTask, TaskThread<SchedulerTask>> threads = new ConcurrentHashMap<>();
 
@@ -26,15 +28,13 @@ public class TaskSchedulerImpl<T extends SchedulerTask> extends
 	}
 
 	@Override
-	public void schedule(T task, TaskExecutionPolicy scheduling) {
-		schedule(task, scheduling, null);
+	public void schedule(T task, Optional<TaskExecutionPolicy> scheduling) {
+		schedule(task, scheduling, Optional.empty());
 	}
 
 	@Override
-	public void schedule(T task, TaskExecutionPolicy scheduling,
-			TaskTerminationPolicy termination) {
-		TaskThread<SchedulerTask> thread = new TaskThread<SchedulerTask>(task,
-				scheduling, termination);
+	public void schedule(T task, Optional<TaskExecutionPolicy> scheduling, Optional<TaskTerminationPolicy> termination) {
+		TaskThread<SchedulerTask> thread = new TaskThread<SchedulerTask>(task, scheduling, termination);
 
 		thread.addObserver(this);
 
@@ -66,9 +66,7 @@ public class TaskSchedulerImpl<T extends SchedulerTask> extends
 	}
 
 	@Override
-	public void notify(
-			Observable<TaskThread<SchedulerTask>, SchedulerEvent> observable,
-			SchedulerEvent event) {
+	public void notify(Observable<TaskThread<SchedulerTask>, SchedulerEvent> observable, SchedulerEvent event) {
 		super.notify(event);
 	}
 

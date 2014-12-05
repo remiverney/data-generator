@@ -111,6 +111,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="tns:property" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded" namespace="##local"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

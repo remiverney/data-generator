@@ -13,6 +13,12 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+			<annotationProcessors>
+				<annotationProcessor>org.datagen.utils.annotation.processing.I18nAnnotationProcessor</annotationProcessor>
+				<annotationProcessor>org.datagen.utils.annotation.processing.ImmutableAnnotationProcessor</annotationProcessor>
+			</annotationProcessors>
+		</configuration>
       </plugin>
     </plugins>
   </build>

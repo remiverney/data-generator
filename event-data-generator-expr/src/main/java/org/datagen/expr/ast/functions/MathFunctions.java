@@ -42,59 +42,72 @@ public final class MathFunctions {
 	public static final Function<Double, Double> abs = Math::abs;
 	public static final Function<Long, Long> labs = Math::abs;
 
+	@Derivable
 	public static final Function<Double, Double> asin = Math::asin;
+	@Derivable
 	public static final Function<Double, Double> atan = Math::atan;
 	public static final BiFunction<Double, Double, Double> atan2 = Math::atan2;
 
+	@Derivable
 	public static final Function<Double, Double> cbrt = Math::cbrt;
 	public static final Function<Double, Double> ceil = Math::ceil;
 
-	@Derivable(f = "sin")
+	@Derivable
 	public static final Function<Double, Double> cos = Math::cos;
+	@Derivable
 	public static final Function<Double, Double> cosh = Math::cosh;
 
+	@Derivable
 	public static final Function<Double, Double> exp = Math::exp;
 
 	public static final Function<Double, Double> floor = Math::floor;
 
 	public static final BiFunction<Double, Double, Double> hypot = Math::hypot;
 
+	@Derivable
 	public static final Function<Double, Double> log = Math::log;
+	@Derivable
 	public static final Function<Double, Double> ln = Math::log;
+	@Derivable
 	public static final Function<Double, Double> log10 = Math::log10;
 
-	public static final VarArgFunction<Double, Double> max = t -> Arrays
-			.asList(t).stream().reduce(Double.MIN_VALUE, Math::max);
+	public static final VarArgFunction<Double, Double> max = t -> Arrays.asList(t).stream()
+			.reduce(Double.MIN_VALUE, Math::max);
 
-	public static final VarArgFunction<Double, Double> min = t -> Arrays
-			.asList(t).stream().reduce(Double.MAX_VALUE, Math::min);
+	public static final VarArgFunction<Double, Double> min = t -> Arrays.asList(t).stream()
+			.reduce(Double.MAX_VALUE, Math::min);
 
-	public static final VarArgFunction<Long, Long> lmax = t -> Arrays.asList(t)
-			.stream().reduce(Long.MIN_VALUE, Math::max);
+	public static final VarArgFunction<Long, Long> lmax = t -> Arrays.asList(t).stream()
+			.reduce(Long.MIN_VALUE, Math::max);
 
-	public static final VarArgFunction<Long, Long> lmin = t -> Arrays.asList(t)
-			.stream().reduce(Long.MAX_VALUE, Math::min);
+	public static final VarArgFunction<Long, Long> lmin = t -> Arrays.asList(t).stream()
+			.reduce(Long.MAX_VALUE, Math::min);
 
 	public static final Function<Double, Long> round = Math::round;
 	public static final Function<Double, Double> signum = Math::signum;
 
+	@Derivable
 	public static final Function<Double, Double> sin = Math::sin;
+	@Derivable
 	public static final Function<Double, Double> sinh = Math::sinh;
 
+	@Derivable
 	public static final Function<Double, Double> sqrt = Math::sqrt;
 
+	@Derivable
 	public static final Function<Double, Double> tan = Math::tan;
+	@Derivable
 	public static final Function<Double, Double> tanh = Math::tanh;
 
 	public static final Function<Double, Double> deg = Math::toDegrees;
 	public static final Function<Double, Double> rad = Math::toRadians;
 
 	public static final Function<Double, Boolean> isNan = (x -> Double.isNaN(x));
-	public static final Function<Double, Boolean> isInfinite = (x -> Double
-			.isInfinite(x));
-	public static final Function<Double, Boolean> isFinite = (x -> Double
-			.isFinite(x));
+	public static final Function<Double, Boolean> isInfinite = (x -> Double.isInfinite(x));
+	public static final Function<Double, Boolean> isFinite = (x -> Double.isFinite(x));
 
+	@Derivable
 	public static final Function<Double, Double> identity = (x -> x);
+	@Derivable
 	public static final Function<Double, Double> nil = (x -> 0.0d);
 }

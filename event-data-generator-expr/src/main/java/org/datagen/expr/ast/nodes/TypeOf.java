@@ -8,7 +8,9 @@ import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class TypeOf implements Node {
 
 	protected final Node expr;

@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Optional;
 
 import org.datagen.expr.DateProvider;
 import org.datagen.expr.ast.Library;
@@ -15,7 +16,9 @@ import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.parallel.ParallelExecutor;
 import org.datagen.expr.interpreter.Interpreter;
 import org.datagen.utils.EmptyFunction;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class PrivateDelegateEvalContextImpl implements EvalContext {
 
 	private final EvalContext delegate;
@@ -154,13 +157,23 @@ public class PrivateDelegateEvalContextImpl implements EvalContext {
 	}
 
 	@Override
-	public ParallelExecutor getParallelExecutor() {
+	public Optional<ParallelExecutor> getParallelExecutor() {
 		return this.delegate.getParallelExecutor();
 	}
 
 	@Override
 	public Interpreter getInterpreter() {
 		return this.delegate.getInterpreter();
+	}
+
+	@Override
+	public Map<String, Value> getProperties() {
+		return this.delegate.getProperties();
+	}
+
+	@Override
+	public Map<String, Value> getFields() {
+		return this.delegate.getFields();
 	}
 
 }

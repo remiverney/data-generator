@@ -7,7 +7,9 @@ import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Reference;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class LibraryRef implements Reference {
 
 	private final String library;
@@ -39,8 +41,7 @@ public class LibraryRef implements Reference {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		return builder.append(library).append(':').append(entry);
 	}
 }

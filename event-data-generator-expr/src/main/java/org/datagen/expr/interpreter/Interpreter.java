@@ -4,59 +4,70 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.annotation.Nonnull;
+
+import org.datagen.config.Configurable;
 import org.datagen.exception.CircularDependencyException;
 import org.datagen.exception.UnresolvedDependencyException;
 import org.datagen.expr.ast.context.ValidationResult;
 import org.datagen.expr.ast.exception.ParsingException;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.factory.Config;
+import org.datagen.mbean.Manageable;
 import org.datagen.utils.EmptyFunction;
+import org.datagen.utils.Identifiable;
 import org.datagen.utils.Observable;
 
-public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
+public interface Interpreter extends Observable<Interpreter, InterpreterEvent>, Identifiable<String>, Manageable,
+		Configurable<InterpreterParameters> {
 
-	ValidationResult registerExpression(String column, String expression) throws CircularDependencyException,
+	@Nonnull
+	ValidationResult registerExpression(@Nonnull String column, @Nonnull String expression)
+			throws CircularDependencyException, UnresolvedDependencyException, ParsingException;
+
+	@Nonnull
+	ValidationResult registerExpression(@Nonnull String column, @Nonnull InputStream stream)
+			throws CircularDependencyException, UnresolvedDependencyException, IOException, ParsingException;
+
+	@Nonnull
+	ValidationResult registerExpression(@Nonnull String column, @Nonnull Reader reader)
+			throws CircularDependencyException, UnresolvedDependencyException, IOException, ParsingException;
+
+	void registerExpressionsString(@Nonnull Map<String, String> expressions) throws CircularDependencyException,
 			UnresolvedDependencyException, ParsingException;
 
-	ValidationResult registerExpression(String column, InputStream stream) throws CircularDependencyException,
+	void registerExpressionsStream(@Nonnull Map<String, InputStream> expressions) throws CircularDependencyException,
 			UnresolvedDependencyException, IOException, ParsingException;
 
-	ValidationResult registerExpression(String column, Reader reader) throws CircularDependencyException,
+	void registerExpressionsReader(@Nonnull Map<String, Reader> expressions) throws CircularDependencyException,
 			UnresolvedDependencyException, IOException, ParsingException;
 
-	void registerExpressionsString(Map<String, String> expressions) throws CircularDependencyException,
-			UnresolvedDependencyException, ParsingException;
+	void unregisterExpression(@Nonnull String column) throws CircularDependencyException, UnresolvedDependencyException;
 
-	void registerExpressionsStream(Map<String, InputStream> expressions) throws CircularDependencyException,
-			UnresolvedDependencyException, IOException, ParsingException;
+	void registerLibrary(@Nonnull String name, @Nonnull Map<String, String> library) throws ParsingException;
 
-	void registerExpressionsReader(Map<String, Reader> expressions) throws CircularDependencyException,
-			UnresolvedDependencyException, IOException, ParsingException;
+	void unregisterLibrary(@Nonnull String name);
 
-	void unregisterExpression(String column) throws CircularDependencyException, UnresolvedDependencyException;
+	void setProperty(@Nonnull String property, @Nonnull Value value);
 
-	void registerLibrary(String name, Map<String, String> library) throws ParsingException;
+	void setProperty(@Nonnull String property, @Nonnull EmptyFunction<Value> provider);
 
-	void unregisterLibrary(String name);
+	void unsetProperty(@Nonnull String property);
 
-	void setProperty(String property, Value value);
+	void setConfiguration(Optional<Config<InterpreterParameters>> configuration);
 
-	void setProperty(String property, EmptyFunction<Value> provider);
-
-	void unsetProperty(String property);
-
-	void setConfiguration(Config<InterpreterParameters> configuration);
-
-	Config<InterpreterParameters> getConfiguration();
-
+	@Nonnull
 	Map<String, Value> eval();
 
+	@Nonnull
 	Value eval(String column);
 
+	@Nonnull
 	Map<String, String> evalToString();
 
-	String get(String column);
+	String get(@Nonnull String column);
 
 	void clear();
 
@@ -66,5 +77,6 @@ public interface Interpreter extends Observable<Interpreter, InterpreterEvent> {
 
 	void setJavaRefClassLoader(ClassLoader loader);
 
-	ClassLoader getJavaRefClassLoader();
+	@Nonnull
+	Optional<ClassLoader> getJavaRefClassLoader();
 }

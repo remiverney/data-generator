@@ -5,7 +5,9 @@ import org.datagen.expr.ast.exception.UnresolvedReferenceException;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Reference;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class ThisRef implements Reference {
 
 	public static final String THIS_VARIABLE = "#this#";
@@ -31,8 +33,7 @@ public class ThisRef implements Reference {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		return builder.append(THIS);
 	}
 

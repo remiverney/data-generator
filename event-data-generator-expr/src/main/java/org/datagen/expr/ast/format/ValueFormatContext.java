@@ -3,27 +3,37 @@ package org.datagen.expr.ast.format;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+
 import org.datagen.expr.ast.Array;
 import org.datagen.expr.ast.Lambda;
 import org.datagen.expr.ast.Mapped;
 
 public interface ValueFormatContext extends Serializable {
 
-	default String formatString(String value) {
+	@Nonnull
+	default String formatString(@Nonnull String value) {
 		return value;
 	}
 
+	@Nonnull
 	String formatInteger(long value);
 
+	@Nonnull
 	String formatReal(double value);
 
+	@Nonnull
 	String formatBoolean(boolean value);
 
-	String formatDate(Date value);
+	@Nonnull
+	String formatDate(@Nonnull Date value);
 
-	String formatLambda(Lambda lambda);
+	@Nonnull
+	String formatLambda(@Nonnull Lambda lambda);
 
-	String formatArray(Array array);
+	@Nonnull
+	String formatArray(@Nonnull Array array);
 
-	String formatMapped(Mapped mapped);
+	@Nonnull
+	String formatMapped(@Nonnull Mapped mapped);
 }

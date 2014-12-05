@@ -9,7 +9,9 @@ import org.datagen.expr.ast.intf.Arithmetic;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
 import org.datagen.expr.ast.intf.ValueType;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class Negation extends UnaryOp<Arithmetic> {
 
 	public Negation(Node rhs) {

@@ -8,7 +8,9 @@ import org.datagen.expr.ast.context.EvalContext;
 import org.datagen.expr.ast.format.ExpressionFormatContext;
 import org.datagen.expr.ast.intf.Node;
 import org.datagen.expr.ast.intf.Value;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class CaseWhen implements Node {
 
 	private final Node when;
@@ -43,8 +45,7 @@ public class CaseWhen implements Node {
 	}
 
 	@Override
-	public StringBuilder toString(StringBuilder builder,
-			ExpressionFormatContext context) {
+	public StringBuilder toString(StringBuilder builder, ExpressionFormatContext context) {
 		context.formatKeyword(builder, Keywords.WHEN);
 		context.spacing(builder);
 		when.toString(builder, context);

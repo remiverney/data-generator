@@ -12,7 +12,7 @@ import org.datagen.expr.ast.functions.ShortOperators;
 @parser::members {
 	private org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration;
 	private org.datagen.expr.ast.context.EvalContext context;
-	private ClassLoader loader = null;
+	private Optional<ClassLoader> loader = null;
 	
 	public void setConfiguration(org.datagen.factory.Config<org.datagen.expr.interpreter.InterpreterParameters> configuration) {
 		this.configuration = configuration;
@@ -22,7 +22,7 @@ import org.datagen.expr.ast.functions.ShortOperators;
 		this.context = context;
 	}
 	
-	public void setJavaRefClassLoader(ClassLoader loader) {
+	public void setJavaRefClassLoader(Optional<ClassLoader> loader) {
 		this.loader = loader;
 	}
 	
@@ -97,7 +97,7 @@ whenspec returns [CaseWhen node]: 'WHEN' when=expr 'THEN' then=expr
 primary returns [Node node]: '(' e=expr ')'
                              {$node = $e.node;}
                            | IntegerConstant
-                             {$node = optimizer.optimize(new LiteralValue(Long.parseLong($IntegerConstant.text)));}
+                             {$node = optimizer.optimize(LiteralValue.from(Long.parseLong($IntegerConstant.text)));}
                            | DecimalFloatingConstant
                              {$node = optimizer.optimize(new LiteralValue(Double.parseDouble($DecimalFloatingConstant.text)));}
                            | StringLiteral
@@ -129,7 +129,7 @@ primary returns [Node node]: '(' e=expr ')'
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_MAPPED)}? '{' mapped=mappedexprlist '}'
                              {$node = optimizer.optimize(new MappedDef($mapped.map));}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? 'java:' javafqn=javafqname ( hasarg='(' el=exprlist ')')?
-                             {$node = optimizer.optimize($hasarg != null ? new JavaRef($javafqn.javafqn, $el.list, this.loader) : new JavaRef($javafqn.javafqn, this.loader));}
+                             {$node = optimizer.optimize($hasarg != null ? new JavaRef($javafqn.javafqn, Optional.<List<Node>> of($el.list), this.loader) : new JavaRef($javafqn.javafqn, this.loader));}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_LIBRARY_REFERENCE)}? lib=Identifier ':' entry=Identifier
                              {$node = optimizer.optimize(new LibraryRef($lib.text, $entry.text));}
                            | {configuration.isEnabled(org.datagen.expr.interpreter.InterpreterParameters.ALLOW_FUNCTION)}? ':' Identifier '(' el=exprlist ')'

@@ -1,10 +1,13 @@
 package org.datagen.expr.ast.context;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.datagen.expr.DateProvider;
 import org.datagen.expr.ast.Library;
@@ -53,14 +56,13 @@ public class EvalContextImpl implements EvalContext {
 	private final ValueFormatContext formatContext;
 	private final FunctionRegistry functionRegistry;
 	private final boolean isParallelizable;
-	private final ParallelExecutor parallelExecutor;
+	private final Optional<ParallelExecutor> parallelExecutor;
 	private final Interpreter interpreter;
 
 	private long sequence = 1;
 
-	public EvalContextImpl(DateProvider dateProvider,
-			ValueFormatContext formatContext, boolean isParallelizable,
-			ParallelExecutor parallelExecutor, Interpreter interpreter) {
+	public EvalContextImpl(DateProvider dateProvider, ValueFormatContext formatContext, boolean isParallelizable,
+			Optional<ParallelExecutor> parallelExecutor, Interpreter interpreter) {
 		this.dateProvider = dateProvider;
 		this.formatContext = formatContext;
 		this.functionRegistry = new FunctionRegistryImpl();
@@ -69,8 +71,7 @@ public class EvalContextImpl implements EvalContext {
 		this.interpreter = interpreter;
 
 		setProperty(PROPERTY_SEQUENCE, () -> new LiteralValue(sequence));
-		setProperty(PROPERTY_TIME,
-				() -> new LiteralValue(dateProvider.getDate()));
+		setProperty(PROPERTY_TIME, () -> new LiteralValue(dateProvider.getDate()));
 		setProperty(PROPERTY_STARTTIME, new LiteralValue(new Date()));
 
 		pushContext();
@@ -101,6 +102,12 @@ public class EvalContextImpl implements EvalContext {
 	}
 
 	@Override
+	public Map<String, Value> getProperties() {
+		return properties.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry<String, EmptyFunction<Value>>::getKey, x -> x.getValue().apply()));
+	}
+
+	@Override
 	public Value getField(String field) {
 		return fields.get(field);
 	}
@@ -113,6 +120,11 @@ public class EvalContextImpl implements EvalContext {
 	@Override
 	public Value unsetField(String field) {
 		return fields.remove(field);
+	}
+
+	@Override
+	public Map<String, Value> getFields() {
+		return Collections.<String, Value> unmodifiableMap(fields);
 	}
 
 	@Override
@@ -213,7 +225,7 @@ public class EvalContextImpl implements EvalContext {
 	}
 
 	@Override
-	public ParallelExecutor getParallelExecutor() {
+	public Optional<ParallelExecutor> getParallelExecutor() {
 		return this.parallelExecutor;
 	}
 

@@ -1,7 +1,9 @@
 package org.datagen.expr.ast.exception;
 
 import org.datagen.expr.ast.intf.Node;
+import org.datagen.utils.annotation.Immutable;
 
+@Immutable
 public class InterruptedParallelExecutionException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;

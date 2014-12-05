@@ -1,10 +1,20 @@
 package org.datagen.factory;
 
 import java.io.Serializable;
+import java.util.Optional;
+import java.util.Set;
 
-public interface Config<P> {
+import javax.annotation.Nonnull;
 
-	<C extends Serializable> C get(P parameter);
+public interface Config<P extends BuilderParameter<?>> {
+
+	<C extends Serializable> Optional<C> get(@Nonnull P parameter);
+
+	Set<P> getKeys();
 
 	boolean isEnabled(P parameter);
+
+	static <P extends BuilderParameter<?>> Config<P> ensure(Optional<Config<P>> configuration) {
+		return configuration.orElseGet(() -> new ConfigBuilder<P>().build());
+	}
 }
